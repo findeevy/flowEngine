@@ -39,3 +39,11 @@
 
 # debug information files
 *.dwo
+
+/src/glad
+/include/KHR
+/include/imgui
+/include/glad
+
+events.log
+imgui.ini
