@@ -2,10 +2,12 @@
 
 #include <glm/vec3.hpp>
 
+#include "texture.h"
+
 class Material {
 public:
-  GLuint diffuseMap = 0;
-  GLuint specularMap = 0;
+  Texture diffuseMap;
+  Texture specularMap;
   float specularScalar = 1.0f;
   float diffuseScalar = 1.0f;
 }
