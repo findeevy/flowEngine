@@ -1,12 +1,19 @@
 #!/bin/bash
 set -e
- 
+
+
+if [ -d "tinyobjloader/.git" ]; then
+    git -C tinyobjloader pull --ff-only
+else
+    git clone --depth 1 \
+    https://github.com/tinyobjloader/tinyobjloader.git
+fi
+
 if [ -d "imgui/.git" ]; then
     git -C imgui pull --ff-only
 else
     git clone --branch docking --depth 1 \
-        https://github.com/ocornut/imgui.git \
-        imgui
+        https://github.com/ocornut/imgui.git \        
 fi
  
 sudo pacman -S glad

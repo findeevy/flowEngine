@@ -8,4 +8,5 @@ class Mesh {
 public:
   std::vector<vertex> vertices;
   std::vector<unsigned int> indices;
+
 };
