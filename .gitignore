@@ -44,6 +44,7 @@
 /include/KHR
 /include/imgui
 /include/glad
+/include/tinyobjloader
 
 events.log
 imgui.ini
