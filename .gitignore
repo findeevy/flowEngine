@@ -43,6 +43,7 @@
 /src/glad
 /include/KHR
 /include/imgui
+/include/stb
 /include/glad
 /include/tinyobjloader
 
