@@ -1,6 +1,12 @@
 #!/bin/bash
 set -e
 
+if [ -d "stb/.git" ]; then
+    git -C stb pull --ff-only
+else
+    git clone --depth 1 \
+    https://github.com/nothings/stb.git
+fi
 
 if [ -d "tinyobjloader/.git" ]; then
     git -C tinyobjloader pull --ff-only
