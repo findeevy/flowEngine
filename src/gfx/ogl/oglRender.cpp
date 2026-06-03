@@ -1,5 +1,5 @@
-#include "render.h"
 #include "../utils/logger.h"
+#include "render.h"
 #include <GLFW/glfw3.h>
 
 void glInstance::init() {

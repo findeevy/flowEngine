@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../../include/tinyobjloader/tinyobjloader.h"
-#include "../gfx/vertex.h"
+#include "tinyobjloader.h"
+#include "vertex.h"
 #include <glm/vec3.hpp>
 #include <string>
 #include <vector>

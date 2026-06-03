@@ -1,30 +1,25 @@
 #pragma once
 
 #include "material.h"
-#include "mesh.h"
+#include "../gfx/mesh.h"
 
+#include <cstdint>
 #include <glm/quat.hpp>
 #include <glm/vec3.hpp>
-#include <cstdint>
 #include <string>
 #include <vector>
+#include <memory>
 
 class GameObject {
 public:
-  GameObject(const std::string &objectName, const std::string &meshFilePath,
-             const Material &objectMaterial, const glm::vec3 &objectPosition,
-             const glm::quat &objectRotation) {
-    name = objectName;
-    mesh = Mesh(meshFilePath);
-    material = objectMaterial;
-    position = objectPosition;
-    rotation = objectRotation;
-  }
+  GameObject(const std::string &_name, const std::string &meshFilePath,
+             const Material &_material, const glm::vec3 &_position,
+             const glm::quat &_rotation);
 
-  Material material;
-  Mesh mesh;
+  std::shared_ptr<Texture> Material material;
+  std::shared_ptr<Mesh> mesh;
   glm::vec3 position{0.0f, 0.0f, 0.0f};
-  uint32 uid = 0;
+  uint32_t uid = 0;
   glm::quat rotation{1.0f, 0.0f, 0.0f, 0.0f};
-  std::string name;
+  std::string name = "";
 };
