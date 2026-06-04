@@ -16,7 +16,7 @@ public:
 private:
   bool showOptions = true;
   bool showAssets = true;
-  bool showRender = true;
+  bool shoFlowEngineder = true;
 
   std::vector<Event> guiQueue;
 

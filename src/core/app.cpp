@@ -1,7 +1,7 @@
 #include "app.h"
 #include "../utils/logger.h"
 
-void WREN::start() {
+void FlowEngine::start() {
   init();
   while (!window.shouldClose()) {
     update();
@@ -9,16 +9,16 @@ void WREN::start() {
   shutdown();
 }
 
-void WREN::init() {
-  window.initWindow(1280, 720, "WREN");
+void FlowEngine::init() {
+  window.initWindow(1280, 720, "FlowEngine");
   renderer.init();
   gui.init(window.getWindowPtr());
   // network.init();
-  LOG_EVENT("WREN started");
+  LOG_EVENT("FlowEngine started");
   network.detectHostIp();
 }
 
-void WREN::update() {
+void FlowEngine::update() {
   renderer.draw();
   gui.draw();
   window.swapBuffers();
@@ -28,12 +28,12 @@ void WREN::update() {
   process();
 }
 
-void WREN::updateQueue(std::vector<Event> events) {
+void FlowEngine::updateQueue(std::vector<Event> events) {
   eventQueue.insert(eventQueue.end(), std::make_move_iterator(events.begin()),
                     std::make_move_iterator(events.end()));
 }
 
-void WREN::process() {
+void FlowEngine::process() {
   for (Event &event : eventQueue) {
     std::visit(
         [&](auto &&ev) {
@@ -49,8 +49,8 @@ void WREN::process() {
   eventQueue.clear();
 }
 
-void WREN::shutdown() {
+void FlowEngine::shutdown() {
   gui.shutdown();
   window.closeWindow();
-  LOG_EVENT("WREN closed");
+  LOG_EVENT("FlowEngine closed");
 }

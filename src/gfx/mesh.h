@@ -52,6 +52,6 @@ public:
   }
 
 private:
-  std::vector<vertex> vertices;
+  std::vector<Vertex> vertices;
   std::vector<unsigned int> indices;
 };

@@ -48,7 +48,7 @@ void guiInstance::draw() {
     if (ImGui::BeginMenu("View")) {
       ImGui::MenuItem("Options", NULL, &showOptions);
       ImGui::MenuItem("Assets", NULL, &showAssets);
-      ImGui::MenuItem("Render", NULL, &showRender);
+      ImGui::MenuItem("Render", NULL, &shoFlowEngineder);
       ImGui::EndMenu();
     }
     ImGui::EndMainMenuBar();
@@ -58,7 +58,7 @@ void guiInstance::draw() {
     optionsPanel();
   if (showAssets)
     assetsPanel();
-  if (showRender)
+  if (shoFlowEngineder)
     renderPanel();
 
   ImGui::Render();

@@ -1,14 +1,14 @@
 #pragma once
 
-#include "material.h"
 #include "../gfx/mesh.h"
+#include "material.h"
 
 #include <cstdint>
 #include <glm/quat.hpp>
 #include <glm/vec3.hpp>
+#include <memory>
 #include <string>
 #include <vector>
-#include <memory>
 
 class GameObject {
 public:
@@ -16,7 +16,7 @@ public:
              const Material &_material, const glm::vec3 &_position,
              const glm::quat &_rotation);
 
-  std::shared_ptr<Texture> Material material;
+  std::shared_ptr<Material> material;
   std::shared_ptr<Mesh> mesh;
   glm::vec3 position{0.0f, 0.0f, 0.0f};
   uint32_t uid = 0;

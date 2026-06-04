@@ -1,7 +1,7 @@
 #include "core/app.h"
 
 int main() {
-  WREN app;
+  FlowEngine app;
   app.start();
   return 0;
 }

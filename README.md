@@ -1,4 +1,7 @@
+ENGINE STILL IN VERY EARLY DEV!
+
 - C++ and OpenGL
+- PBR
 - Editor and Player Model
 - Easy Mapping Tools
 
@@ -6,6 +9,8 @@
 layout logic:
 
 if it's loaded from disk automatically (texture, mesh, glsl shader, etc) put it into gfx, if it is generated via engine command put it in scene (material, gameObject).
+
+!(FlowEngine.png)
 
 
 src/

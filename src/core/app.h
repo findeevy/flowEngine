@@ -8,7 +8,7 @@
 #include "../net/network.h"
 #include "window.h"
 
-class WREN {
+class FlowEngine {
 public:
   void start();
 
