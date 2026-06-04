@@ -10,7 +10,7 @@ layout logic:
 
 if it's loaded from disk automatically (texture, mesh, glsl shader, etc) put it into gfx, if it is generated via engine command put it in scene (material, gameObject).
 
-!(FlowEngine.png)
+!(https://github.com/findeevy/FlowEngine/blob/main/FlowEngine.png)
 
 
 src/
