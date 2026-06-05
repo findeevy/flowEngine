@@ -6,4 +6,4 @@
 class Pipeline {
 public:
   virtual ~Pipeline() = default;
-}
+};
