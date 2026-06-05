@@ -13,10 +13,11 @@ public:
 
   std::shared_ptr<Texture> diffuseMap;
   std::shared_ptr<Texture> specularMap;
+
   glm::vec3 diffuseTint;
   glm::vec3 specularTint;
 
-  Material(const Pipeline _pipeline, const std::string &diffusePath,
+  Material(const Pipeline &_pipeline, const std::string &diffusePath,
            const std::string &specularPath, const glm::vec3 &_diffuseTint,
            const glm::vec3 &_specularTint);
 };

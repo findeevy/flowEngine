@@ -1,7 +1,7 @@
 #pragma once
 
+#include <glm/quaternion.hpp>
 #include <glm/vec3.hpp>
-#include <qlm/quaternion.hpp>
 
 class Camera {
 public:

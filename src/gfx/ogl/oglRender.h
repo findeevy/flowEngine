@@ -2,8 +2,8 @@
 
 #include <glad/gl.h>
 
-class glInstance {
+class OGLRender : public Render {
 public:
-  void init();
-  void draw();
+  OGLRender();
+  void draw(const Scene &_scene);
 };
