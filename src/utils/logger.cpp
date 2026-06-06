@@ -60,3 +60,8 @@ void Logger::LogEvent(const std::string &functionName,
   if (outFile.is_open())
     outFile << fullText;
 }
+
+void Logger::LogEvent(const std::string &functionName,
+                      const char *description) {
+  LogEvent(functionName, std::string(description));
+}

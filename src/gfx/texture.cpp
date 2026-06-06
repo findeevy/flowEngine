@@ -1,6 +1,6 @@
 #include "texture.h"
 #include "../utils/logger.h"
-#include "std_image.h"
+#include "stb_image.h"
 
 #include <stdexcept>
 

@@ -1,5 +1,5 @@
+#include "../../utils/logger.h"
 #include "../render.h"
-#include "../utils/logger.h"
 #include <GLFW/glfw3.h>
 
 OGLRender::OGLRender() {
@@ -10,9 +10,9 @@ OGLRender::OGLRender() {
 }
 
 void OGLRender::draw(const Scene &_scene) {
-  glClearColor(clearColor);
+  glClearColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
   glClear(GL_COLOR_BUFFER_BIT);
-  for (const auto &object :_scene.gameObjects) {
+  for (const auto &object : _scene.gameObjects) {
     // draw
   }
 }
