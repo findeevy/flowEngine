@@ -12,6 +12,9 @@ OGLRender::OGLRender() {
 void OGLRender::draw(const Scene &_scene) {
   glClearColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
   glClear(GL_COLOR_BUFFER_BIT);
+
+  // SSBO for lights?
+
   for (const auto &object : _scene.gameObjects) {
     // draw
   }
