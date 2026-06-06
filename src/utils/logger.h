@@ -7,6 +7,7 @@ class Logger {
 public:
   static void LogEvent(const std::string &functionName,
                        const std::string &description);
+  static void LogEvent(const std::string &functionName, const char *);
 };
 
 #define LOG_EVENT(desc) Logger::LogEvent(__FUNCTION__, desc)

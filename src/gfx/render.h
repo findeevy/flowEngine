@@ -1,3 +1,5 @@
+#pragma once
+
 #include "../scene/scene.h"
 #include <glm/vec4.hpp>
 
