@@ -1,9 +1,10 @@
 #pragma once
 
-#include "tinyobjloader.h"
 #include "vertex.h"
-#include <glm/vec3.hpp>
+#include <glm/glm.hpp>
+#include <stdexcept>
 #include <string>
+#include <tiny_obj_loader.h>
 #include <vector>
 
 class Mesh {
@@ -11,4 +12,6 @@ public:
   Mesh(const std::string filePath);
   std::vector<Vertex> vertices;
   std::vector<unsigned int> indices;
+  virtual void draw() = 0;
+  virtual ~Mesh() = default;
 };

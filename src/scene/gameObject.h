@@ -4,22 +4,21 @@
 #include "material.h"
 
 #include <cstdint>
-#include <glm/quat.hpp>
-#include <glm/vec3.hpp>
+#include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
 #include <memory>
 #include <string>
 #include <vector>
 
 class GameObject {
 public:
-  GameObject(const std::string &_name, const std::string &meshFilePath,
+  GameObject(const std::string &_name, std::shared_ptr<Mesh> _mesh,
              const Material &_material, const glm::vec3 &_position,
              const glm::quat &_rotation);
 
-  std::shared_ptr<Material> material;
-  std::shared_ptr<Mesh> mesh;
-  glm::vec3 position{0.0f, 0.0f, 0.0f};
-  uint32_t uid = 0;
-  glm::quat rotation{1.0f, 0.0f, 0.0f, 0.0f};
   std::string name = "";
+  std::shared_ptr<Mesh> mesh;
+  std::shared_ptr<Material> material;
+  glm::vec3 position{0.0f, 0.0f, 0.0f};
+  glm::quat rotation{1.0f, 0.0f, 0.0f, 0.0f};
 };

@@ -16,11 +16,9 @@ public:
 private:
   bool showOptions = true;
   bool showAssets = true;
-  bool showRender = true;
 
   std::vector<Event> guiQueue;
 
   void assetsPanel();
-  void renderPanel();
   void optionsPanel();
 };

@@ -46,6 +46,7 @@
 /include/stb
 /include/glad
 /include/tinyobjloader
+/assets
 
 events.log
 imgui.ini

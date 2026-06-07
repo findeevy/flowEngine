@@ -1,14 +1,11 @@
 CXX := g++
 CC := gcc
-CXXFLAGS := -std=c++17 -Wall -Wextra -DNDEBUG -Ofast -Iinclude -Iinclude/imgui -Iinclude/imgui/backends
+CXXFLAGS := -std=c++17 -Wall -Wextra -DNDEBUG -Ofast -Iinclude -Iinclude/imgui -Iinclude/imgui/backends -Isrc
 CFLAGS := -Iinclude
 LOG := events.log
-SRC_DIR := src
-
-FORMAT_DIR := src
+FORMAT_DIR := src shaders
 CLANG_FORMAT := clang-format
 FORMAT_STYLE := file
-
 ifeq ($(OS),Windows_NT)
     PLATFORM := Windows
     TARGET    := FlowEngine.exe
@@ -23,15 +20,24 @@ else
     RM        := rm -f
     MKDIR     := mkdir -p
 endif
-
-CPP_SRCS := $(SRC_DIR)/main.cpp \
-	$(SRC_DIR)/core/app.cpp \
-	$(SRC_DIR)/core/window.cpp \
-	$(SRC_DIR)/gfx/render.cpp \
-	$(SRC_DIR)/gui/gui.cpp \
-	$(SRC_DIR)/net/network.cpp \
-	$(SRC_DIR)/utils/logger.cpp
-
+CPP_SRCS := src/main.cpp \
+	src/include.cpp \
+        src/core/engine.cpp \
+	src/core/window.cpp \
+	src/gfx/render.cpp \
+	src/gfx/mesh.cpp \
+	src/gfx/texture.cpp \
+	src/gfx/ogl/oglMesh.cpp \
+	src/gfx/ogl/oglTexture.cpp \
+	src/gfx/ogl/oglPipeline.cpp \
+	src/gfx/ogl/oglShader.cpp \
+	src/gfx/ogl/oglRender.cpp \
+	src/gui/gui.cpp \
+	src/net/network.cpp \
+	src/scene/scene.cpp \
+	src/scene/gameObject.cpp \
+	src/scene/material.cpp \
+	src/utils/logger.cpp
 IMGUI_SRCS := include/imgui/imgui.cpp \
               include/imgui/imgui_demo.cpp \
               include/imgui/imgui_draw.cpp \
@@ -39,38 +45,27 @@ IMGUI_SRCS := include/imgui/imgui.cpp \
               include/imgui/imgui_widgets.cpp \
               include/imgui/backends/imgui_impl_glfw.cpp \
               include/imgui/backends/imgui_impl_opengl3.cpp
-
-C_SRCS := $(SRC_DIR)/glad/glad.c
-
+C_SRCS := src/glad/glad.c
 OBJS := $(CPP_SRCS:.cpp=.o) $(IMGUI_SRCS:.cpp=.o)
 C_OBJS := $(C_SRCS:.c=.o)
-
 $(TARGET): $(OBJS) $(C_OBJS)
 	$(CXX) $(CXXFLAGS) $^ -o $@ $(LDFLAGS)
 ifeq ($(OS),Windows_NT)
 	-@$(COPY_DLLS) 2>/dev/null || true
 endif
-
-$(SRC_DIR)/%.o: $(SRC_DIR)/%.cpp
+src/%.o: src/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
-
-$(SRC_DIR)/%.o: $(SRC_DIR)/%.c
+src/%.o: src/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
-
 include/imgui/%.o: include/imgui/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
-
 include/imgui/backends/%.o: include/imgui/backends/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
-
 format:
-	find $(FORMAT_DIR) -type f \( -name "*.cpp" -o -name "*.h" \) \
+	find $(FORMAT_DIR) -type f \( -name "*.cpp" -o -name "*.h" -o -name "*.glsl" \) \
 	    -exec $(CLANG_FORMAT) -i -style=$(FORMAT_STYLE) {} +
-
 clean:
 	$(RM) $(TARGET) $(OBJS) $(C_OBJS) $(LOG)
-
 fast:
 	$(MAKE) -j$(shell nproc 2>/dev/null || echo 4)
-
 .PHONY: format clean fast

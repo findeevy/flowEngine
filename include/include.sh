@@ -18,10 +18,10 @@ fi
 if [ -d "imgui/.git" ]; then
     git -C imgui pull --ff-only
 else
-    git clone --branch docking --depth 1 \
-        https://github.com/ocornut/imgui.git \        
+    git clone --depth 1 \
+        https://github.com/ocornut/imgui.git
 fi
- 
+
 sudo pacman -S glad
  
 mkdir -p glad KHR ../src/glad

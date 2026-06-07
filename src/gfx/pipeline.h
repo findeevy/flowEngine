@@ -6,4 +6,5 @@
 class Pipeline {
 public:
   virtual ~Pipeline() = default;
+  virtual void bind() = 0;
 };
