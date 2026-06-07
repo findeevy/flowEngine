@@ -10,4 +10,4 @@ public:
   OGLTexture(const std::string &filePath);
   void bind(int slot);
   ~OGLTexture();
-}
+};

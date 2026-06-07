@@ -8,8 +8,9 @@
 
 class Scene {
 public:
-  Scene(Camera &_camera, std::vector<GameObject> &_gameObjects,
-        std::vector<PointLight> &_pointLights);
+  Scene() = default;
+  Scene(const Camera &_camera, const std::vector<GameObject> &_gameObjects,
+        const std::vector<PointLight> &_pointLights);
   Camera camera;
   std::vector<GameObject> gameObjects;
   std::vector<PointLight> pointLights;

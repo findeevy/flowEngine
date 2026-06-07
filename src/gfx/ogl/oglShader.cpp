@@ -2,10 +2,11 @@
 
 OGLShader::OGLShader(const std::string &vertexPath,
                      const std::string &fragmentPath) {
+  std::string vertexStr;
+  std::string fragmentStr;
 
   std::ifstream vertexFile;
   std::ifstream fragmentFile;
-
   vertexFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
   fragmentFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 
@@ -13,36 +14,29 @@ OGLShader::OGLShader(const std::string &vertexPath,
     vertexFile.open(vertexPath);
     fragmentFile.open(fragmentPath);
 
-    std::stringstream vertexStream;
-    std::stringstream fragmentStream;
-
+    std::stringstream vertexStream, fragmentStream;
     vertexStream << vertexFile.rdbuf();
     fragmentStream << fragmentFile.rdbuf();
 
-    std::string vertexStr = vertexStream.str();
-    const char *vertexCode = vertexStr.c_str();
-    LOG_EVENT(vertexCode);
-    std::string fragmentStr = fragmentStream.str();
-    const char *fragmentCode = fragmentStr.c_str();
-    LOG_EVENT(fragmentCode);
+    vertexStr = vertexStream.str();
+    fragmentStr = fragmentStream.str();
   } catch (const std::ifstream::failure &e) {
     LOG_EVENT(e.what());
   }
 
-  unsigned vertex;
-  unsigned fragment;
+  const char *vertexCode = vertexStr.c_str();
+  const char *fragmentCode = fragmentStr.c_str();
 
-  vertex = glCreateShader(GL_VERTEX_SHADER);
+  unsigned int vertex = glCreateShader(GL_VERTEX_SHADER);
   glShaderSource(vertex, 1, &vertexCode, NULL);
   glCompileShader(vertex);
   checkCompileErrors(vertex, "VERTEX");
 
-  fragment = glCreateShader(GL_FRAGMENT_SHADER);
+  unsigned int fragment = glCreateShader(GL_FRAGMENT_SHADER);
   glShaderSource(fragment, 1, &fragmentCode, NULL);
   glCompileShader(fragment);
   checkCompileErrors(fragment, "FRAGMENT");
 
-  // assign id to shader program
   id = glCreateProgram();
   glAttachShader(id, vertex);
   glAttachShader(id, fragment);
@@ -53,54 +47,41 @@ OGLShader::OGLShader(const std::string &vertexPath,
   glDeleteShader(fragment);
 }
 
-void OGLShader::setBool(const std::string &name, bool value) const {
-  glUniform1i(glGetUniformLocation(id, name.c_str()), (int)value);
-}
-
-void OGLShader::setInt(const std::string &name, int value) const {
+void OGLShader::setBool(const std::string &name, bool value) {
   glUniform1i(glGetUniformLocation(id, name.c_str()), value);
 }
 
-void OGLShader::setFloat(const std::string &name, float value) const {
+void OGLShader::setInt(const std::string &name, int value) {
+  glUniform1i(glGetUniformLocation(id, name.c_str()), value);
+}
+
+void OGLShader::setFloat(const std::string &name, float value) {
   glUniform1f(glGetUniformLocation(id, name.c_str()), value);
 }
 
-void OGLShader::setVec2(const std::string &name, const glm::vec2 &value) const {
+void OGLShader::setVec2(const std::string &name, const glm::vec2 &value) {
   glUniform2fv(glGetUniformLocation(id, name.c_str()), 1, &value[0]);
 }
 
-void OGLShader::setVec2(const std::string &name, float x, float y) const {
-  glUniform2f(glGetUniformLocation(id, name.c_str()), x, y);
-}
-
-void OGLShader::setVec3(const std::string &name, const glm::vec3 &value) const {
+void OGLShader::setVec3(const std::string &name, const glm::vec3 &value) {
   glUniform3fv(glGetUniformLocation(id, name.c_str()), 1, &value[0]);
 }
-void OGLShader::setVec3(const std::string &name, float x, float y,
-                        float z) const {
-  glUniform3f(glGetUniformLocation(id, name.c_str()), x, y, z);
-}
 
-void OGLShader::setVec4(const std::string &name, const glm::vec4 &value) const {
+void OGLShader::setVec4(const std::string &name, const glm::vec4 &value) {
   glUniform4fv(glGetUniformLocation(id, name.c_str()), 1, &value[0]);
 }
 
-void OGLShader::setVec4(const std::string &name, float x, float y, float z,
-                        float w) const {
-  glUniform4f(glGetUniformLocation(id, name.c_str()), x, y, z, w);
-}
-
-void OGLShader::setMat2(const std::string &name, const glm::mat2 &value) const {
+void OGLShader::setMat2(const std::string &name, const glm::mat2 &value) {
   glUniformMatrix2fv(glGetUniformLocation(id, name.c_str()), 1, GL_FALSE,
                      &value[0][0]);
 }
 
-void OGLShader::setMat3(const std::string &name, const glm::mat3 &value) const {
+void OGLShader::setMat3(const std::string &name, const glm::mat3 &value) {
   glUniformMatrix3fv(glGetUniformLocation(id, name.c_str()), 1, GL_FALSE,
                      &value[0][0]);
 }
 
-void OGLShader::setMat4(const std::string &name, const glm::mat4 &value) const {
+void OGLShader::setMat4(const std::string &name, const glm::mat4 &value) {
   glUniformMatrix4fv(glGetUniformLocation(id, name.c_str()), 1, GL_FALSE,
                      &value[0][0]);
 }

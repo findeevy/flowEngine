@@ -1,15 +1,25 @@
 #include "material.h"
+#include "../gfx/render.h"
 
-Material::Material(const Pipeline &_pipeline, const std::string &diffusePath,
+static std::optional<std::shared_ptr<Texture>>
+loadIfProvided(Render &renderer, const std::string &path) {
+  if (path.empty())
+    return std::nullopt;
+  return renderer.createTexture(path);
+}
+
+Material::Material(Render &renderer, const std::string &vertexPath,
+                   const std::string &fragmentPath,
+                   const std::string &diffusePath,
                    const std::string &specularPath,
                    const std::string &emissionPath,
-                   const glm::vec3 &_diffuseTint,
+                   const std::string &normalPath, const glm::vec3 &_diffuseTint,
                    const glm::vec3 &_specularTint,
                    const glm::vec3 &_emissionTint)
-    : pipeline(std::make_shared<Pipeline>(_pipeline)),
-      diffuseMap(std::make_shared<Texture>(diffusePath)),
-      emissionMap(std::make_shared<Texture>(emissionPath))
-          specularMap(std::make_shared<Texture>(specularPath)),
+    : pipeline(renderer.createPipeline(vertexPath, fragmentPath)),
+      diffuseMap(loadIfProvided(renderer, diffusePath)),
+      specularMap(loadIfProvided(renderer, specularPath)),
+      emissionMap(loadIfProvided(renderer, emissionPath)),
       diffuseTint(_diffuseTint), specularTint(_specularTint),
       emissionTint(_emissionTint),
-      normalMap(std::make_shared<Texture>(normalPath)) {}
+      normalMap(loadIfProvided(renderer, normalPath)) {}

@@ -1,5 +1,9 @@
 #pragma once
 
+#include "../pipeline.h"
+#include "oglShader.h"
+#include <glad/gl.h>
+
 class OGLPipeline : public Pipeline {
 public:
   // look into other api's equiv, set those to be part of the Pipeline virt
@@ -15,10 +19,10 @@ public:
   GLenum blendSrc = GL_SRC_ALPHA;
   GLenum blendDest = GL_ONE_MINUS_SRC_ALPHA;
 
-  cullFace = true;
-  GLenum cullMode = CL_BACK;
+  bool cullFace = true;
+  GLenum cullMode = GL_BACK;
 
-  OGLPipeline(const std::string &vertexPath, const std::string &vertexPath);
+  OGLPipeline(const std::string &vertexPath, const std::string &fragmentPath);
 
   void bind();
-}
+};

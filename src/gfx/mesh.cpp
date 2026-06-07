@@ -33,7 +33,7 @@ Mesh::Mesh(const std::string filePath) {
                            1.0f -
                                attrib.texcoords[2 * index.texcoord_index + 1]};
       } else {
-        vertex.texCoord = {0.0f, 0.0f, 1.0f};
+        vertex.texCoord = {0.0f, 0.0f};
       }
 
       if (uniqueVertices.count(vertex) == 0) {

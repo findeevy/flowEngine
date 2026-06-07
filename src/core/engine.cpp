@@ -1,4 +1,4 @@
-#include "app.h"
+#include "engine.h"
 #include "../utils/logger.h"
 
 void FlowEngine::start() {
@@ -10,21 +10,47 @@ void FlowEngine::start() {
 }
 
 void FlowEngine::init() {
-  window.initWindow(1280, 720, "FlowEngine");
-  renderer.init();
+  window.initWindow(1920, 1080, "FlowEngine");
+
+  renderer = Render::create(RendererBackend::OpenGL);
+
   gui.init(window.getWindowPtr());
-  // network.init();
+
   LOG_EVENT("FlowEngine started");
+
+  Material mat(*renderer, "shaders/glsl/vertPBR.glsl",
+               "shaders/glsl/fragPBR.glsl", "assets/Albedo.jpg",
+               "assets/Specular.jpg", "", "assets/Normal.jpg", glm::vec3(1),
+               glm::vec3(1), glm::vec3(0));
+
+  auto mesh = renderer->createMesh("assets/Barrel.obj");
+  GameObject barrel("test", mesh, mat, {-1.0f, -1.0f, -30.0f},
+                    glm::quat(glm::radians(glm::vec3(-90.0f, 0.0f, -90.0f))));
+
+  PointLight light;
+  light.color = {1.0f, 1.0f, 1.0f, 50.0f};
+  light.position = {2.0f, 2.0f, 0.0f};
+
+  Camera cam;
+  cam.position = {0.0f, 0.0f, 0.0f};
+  cam.rotation = glm::quat(1, 0, 0, 0);
+
+  scene = Scene(cam, {barrel}, {light});
+
   network.detectHostIp();
 }
 
 void FlowEngine::update() {
-  renderer.draw();
+  renderer->draw(scene);
+
+angle += 0.4f;
+scene.gameObjects[0].rotation = glm::quat(glm::radians(glm::vec3(angle, angle, -90.0f)));
+
   gui.draw();
   window.swapBuffers();
   window.pollInput();
   updateQueue(gui.poll());
-  // updateQueue(network.poll());
+
   process();
 }
 

@@ -8,7 +8,7 @@ public:
   virtual ~Shader() = default;
   virtual void bind() = 0;
 
-  virtual void setBool(const std::string &name, int value) = 0;
+  virtual void setBool(const std::string &name, bool value) = 0;
   virtual void setInt(const std::string &name, int value) = 0;
   virtual void setFloat(const std::string &name, float value) = 0;
 

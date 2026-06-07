@@ -1,5 +1,6 @@
 #pragma once
 
+#include <stb/stb_image.h>
 #include <string>
 
 class Texture {
@@ -11,5 +12,6 @@ public:
 
   Texture(const std::string &filePath);
 
-  ~Texture();
+  virtual void bind(int slot) = 0;
+  virtual ~Texture();
 };

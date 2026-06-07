@@ -1,4 +1,4 @@
-#include "core/app.h"
+#include "core/engine.h"
 
 int main() {
   FlowEngine app;

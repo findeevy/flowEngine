@@ -6,6 +6,7 @@
 #include "../gfx/render.h"
 #include "../gui/gui.h"
 #include "../net/network.h"
+#include "../scene/scene.h"
 #include "window.h"
 
 class FlowEngine {
@@ -15,8 +16,13 @@ public:
 private:
   guiInstance gui;
   windowInstance window;
-  glInstance renderer;
+  std::unique_ptr<Render> renderer;
   networkManager network;
+
+  Scene scene;
+
+  //test
+  float angle = 0.0f;
 
   std::vector<Event> eventQueue;
 
