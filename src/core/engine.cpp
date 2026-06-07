@@ -18,8 +18,8 @@ void FlowEngine::init() {
 
   LOG_EVENT("FlowEngine started");
 
-  Material mat(*renderer, "shaders/glsl/vertPBR.glsl",
-               "shaders/glsl/fragPBR.glsl", "assets/Albedo.jpg",
+  Material mat(*renderer, "shaders/glsl/vertBase.glsl",
+               "shaders/glsl/bayerDitherFrag.glsl", "assets/Albedo.jpg",
                "assets/Specular.jpg", "", "assets/Normal.jpg", glm::vec3(1),
                glm::vec3(1), glm::vec3(0));
 
