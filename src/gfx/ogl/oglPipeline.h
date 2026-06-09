@@ -22,7 +22,7 @@ public:
   bool cullFace = true;
   GLenum cullMode = GL_BACK;
 
-  OGLPipeline(const std::string &vertexPath, const std::string &fragmentPath);
+  OGLPipeline(const std::vector<std::string> &shaderPaths);
 
   void bind();
 };

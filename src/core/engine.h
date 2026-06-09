@@ -21,7 +21,7 @@ private:
 
   Scene scene;
 
-  //test
+  // test
   float angle = 0.0f;
 
   std::vector<Event> eventQueue;

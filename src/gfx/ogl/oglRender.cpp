@@ -26,9 +26,9 @@ std::shared_ptr<Mesh> OGLRender::createMesh(const std::string &path) {
   return std::make_shared<OGLMesh>(path);
 }
 
-std::shared_ptr<Pipeline> OGLRender::createPipeline(const std::string &v,
-                                                    const std::string &f) {
-  return std::make_shared<OGLPipeline>(v, f);
+std::shared_ptr<Pipeline>
+OGLRender::createPipeline(const std::vector<std::string> &shaderPaths) {
+  return std::make_shared<OGLPipeline>(shaderPaths);
 }
 
 void OGLRender::draw(const Scene &_scene) {
@@ -60,9 +60,13 @@ void OGLRender::draw(const Scene &_scene) {
 
   glm::mat4 view = glm::mat4_cast(glm::inverse(_scene.camera.rotation)) *
                    glm::translate(glm::mat4(1.0f), -_scene.camera.position);
+
+  int frameWidth;
+  int frameHeight;
+  glfwGetFramebufferSize(glfwGetCurrentContext(), &frameWidth, &frameHeight);
   glm::mat4 proj =
       glm::perspective(glm::radians(_scene.camera.fov),
-                       _scene.camera.width / _scene.camera.height,
+                       (float)frameWidth / (float)frameHeight,
                        _scene.camera.nearClip, _scene.camera.farClip);
 
   for (const auto &object : _scene.gameObjects) {

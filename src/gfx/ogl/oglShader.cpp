@@ -1,50 +1,70 @@
 #include "oglShader.h"
 
-OGLShader::OGLShader(const std::string &vertexPath,
-                     const std::string &fragmentPath) {
-  std::string vertexStr;
-  std::string fragmentStr;
+OGLShader::OGLShader(const std::vector<std::string> &shaderPaths) {
+  id = glCreateProgram();
+  std::vector<unsigned> shaders;
 
-  std::ifstream vertexFile;
-  std::ifstream fragmentFile;
-  vertexFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-  fragmentFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+  for (int i = 0; i < shaderPaths.size(); i++) {
+    std::string shaderPath = shaderPaths[i];
+    std::string shaderStr;
+    std::ifstream shaderFile;
+    shaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 
-  try {
-    vertexFile.open(vertexPath);
-    fragmentFile.open(fragmentPath);
+    try {
+      shaderFile.open(shaderPath);
 
-    std::stringstream vertexStream, fragmentStream;
-    vertexStream << vertexFile.rdbuf();
-    fragmentStream << fragmentFile.rdbuf();
+      std::stringstream shaderStream;
+      shaderStream << shaderFile.rdbuf();
 
-    vertexStr = vertexStream.str();
-    fragmentStr = fragmentStream.str();
-  } catch (const std::ifstream::failure &e) {
-    LOG_EVENT(e.what());
+      shaderStr = shaderStream.str();
+    } catch (const std::ifstream::failure &e) {
+      LOG_EVENT(e.what());
+    }
+
+    const char *shaderCode = shaderStr.c_str();
+    std::string extension =
+        shaderPath.substr(std::max(0, (int)shaderPath.length() - 4));
+    GLenum shaderType = 0;
+    const char *shaderName = nullptr;
+
+    if (extension == "vert") {
+      shaderType = GL_VERTEX_SHADER;
+      shaderName = "VERTEX";
+    } else if (extension == "frag") {
+      shaderType = GL_FRAGMENT_SHADER;
+      shaderName = "FRAGMENT";
+    } else if (extension == "geom") {
+      shaderType = GL_GEOMETRY_SHADER;
+      shaderName = "GEOMETRY";
+    } else if (extension == "comp") {
+      shaderType = GL_COMPUTE_SHADER;
+      shaderName = "COMPUTE";
+    } else if (extension == "ctrl") {
+      shaderType = GL_TESS_CONTROL_SHADER;
+      shaderName = "CONTROL";
+    } else if (extension == "eval") {
+      shaderType = GL_TESS_EVALUATION_SHADER;
+      shaderName = "EVALUATION";
+    } else {
+      LOG_EVENT(shaderPath + " is an unknown type.");
+      return;
+    }
+
+    unsigned int shader = glCreateShader(shaderType);
+    shaders.emplace_back(shader);
+    glShaderSource(shader, 1, &shaderCode, NULL);
+    glCompileShader(shader);
+    checkCompileErrors(shader, shaderName);
+
+    glAttachShader(id, shader);
   }
 
-  const char *vertexCode = vertexStr.c_str();
-  const char *fragmentCode = fragmentStr.c_str();
-
-  unsigned int vertex = glCreateShader(GL_VERTEX_SHADER);
-  glShaderSource(vertex, 1, &vertexCode, NULL);
-  glCompileShader(vertex);
-  checkCompileErrors(vertex, "VERTEX");
-
-  unsigned int fragment = glCreateShader(GL_FRAGMENT_SHADER);
-  glShaderSource(fragment, 1, &fragmentCode, NULL);
-  glCompileShader(fragment);
-  checkCompileErrors(fragment, "FRAGMENT");
-
-  id = glCreateProgram();
-  glAttachShader(id, vertex);
-  glAttachShader(id, fragment);
   glLinkProgram(id);
   checkCompileErrors(id, "PROGRAM");
 
-  glDeleteShader(vertex);
-  glDeleteShader(fragment);
+  for (int i = 0; i < shaders.size(); i++) {
+    glDeleteShader(shaders[i]);
+  }
 }
 
 void OGLShader::setBool(const std::string &name, bool value) {

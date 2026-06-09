@@ -25,10 +25,9 @@ public:
   std::optional<std::shared_ptr<Texture>> normalMap;
 
 public:
-  Material(Render &renderer, const std::string &vertexPath,
-           const std::string &fragmentPath, const std::string &diffusePath,
-           const std::string &specularPath, const std::string &emissionPath,
-           const std::string &normalPath,
+  Material(Render &renderer, const std::vector<std::string> &shaderPaths,
+           const std::string &diffusePath, const std::string &specularPath,
+           const std::string &emissionPath, const std::string &normalPath,
            const glm::vec3 &diffuseTint = glm::vec3(1),
            const glm::vec3 &specularTint = glm::vec3(1),
            const glm::vec3 &emissionTint = glm::vec3(0));

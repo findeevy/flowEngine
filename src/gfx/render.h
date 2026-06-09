@@ -17,6 +17,6 @@ public:
   virtual void draw(const Scene &scene) = 0;
   virtual std::shared_ptr<Mesh> createMesh(const std::string &path) = 0;
   virtual std::shared_ptr<Texture> createTexture(const std::string &path) = 0;
-  virtual std::shared_ptr<Pipeline> createPipeline(const std::string &vert,
-                                                   const std::string &frag) = 0;
+  virtual std::shared_ptr<Pipeline>
+  createPipeline(const std::vector<std::string> &shaderPaths) = 0;
 };
