@@ -1,10 +1,15 @@
-![](https://raw.githubusercontent.com/findeevy/FlowEngine/main/Logo.png)
+<p align="center">
+  <img src="Logo.png" alt="Flow Logo" width="750">
+</p>
 ---
 ##About
 flowEngine is an open source (early in development) game engine. Currently it supports OpenGL, with infrustructure being built to support Vulkan (among other graphics APIs). It is being built and tested currently on Arch Linux, with Windows support planned in the future.
 ---
 ##Project Structure
-![](https://raw.githubusercontent.com/findeevy/FlowEngine/main/FlowEngine.png)
+
+<p align="center">
+  <img src="FlowEngine" alt="Screenshot" width="750">
+</p>
 ```
 src/
   gfx/ (generic graphics structs, etc)
