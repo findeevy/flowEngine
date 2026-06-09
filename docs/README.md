@@ -8,7 +8,7 @@ flowEngine is an open source (early in development) game engine. Currently it su
 ##Project Structure
 
 <p align="center">
-  <img src="FlowEngine" alt="Screenshot" width="750">
+  <img src="FlowEngine.png" alt="Screenshot" width="750">
 </p>
 ```
 src/
