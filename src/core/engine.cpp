@@ -18,14 +18,22 @@ void FlowEngine::init() {
 
   LOG_EVENT("FlowEngine started");
 
-  Material mat(*renderer, "shaders/glsl/vertBase.glsl",
-               "shaders/glsl/bayerDitherFrag.glsl", "assets/Albedo.jpg",
-               "assets/Specular.jpg", "", "assets/Normal.jpg", glm::vec3(1),
-               glm::vec3(1), glm::vec3(0));
+  Material mat(*renderer,
+               {"shaders/glsl/base.vert", "shaders/glsl/bayerDither.frag"},
+               "assets/Albedo.jpg", "assets/Specular.jpg", "",
+               "assets/Normal.jpg", glm::vec3(1), glm::vec3(1), glm::vec3(0));
+
+  Material matp(*renderer,
+                {"shaders/glsl/base.vert", "shaders/glsl/blinnPhong.frag"},
+                "assets/Albedo.jpg", "assets/Specular.jpg", "",
+                "assets/Normal.jpg", glm::vec3(1), glm::vec3(1), glm::vec3(0));
 
   auto mesh = renderer->createMesh("assets/Barrel.obj");
   GameObject barrel("test", mesh, mat, {-1.0f, -1.0f, -30.0f},
                     glm::quat(glm::radians(glm::vec3(-90.0f, 0.0f, -90.0f))));
+
+  GameObject barr("testu", mesh, matp, {-5.0f, -1.0f, -30.0f},
+                  glm::quat(glm::radians(glm::vec3(-90.0f, 0.0f, -90.0f))));
 
   PointLight light;
   light.color = {1.0f, 1.0f, 1.0f, 50.0f};
@@ -35,7 +43,7 @@ void FlowEngine::init() {
   cam.position = {0.0f, 0.0f, 0.0f};
   cam.rotation = glm::quat(1, 0, 0, 0);
 
-  scene = Scene(cam, {barrel}, {light});
+  scene = Scene(cam, {barrel, barr}, {light});
 
   network.detectHostIp();
 }
@@ -43,8 +51,9 @@ void FlowEngine::init() {
 void FlowEngine::update() {
   renderer->draw(scene);
 
-angle += 0.4f;
-scene.gameObjects[0].rotation = glm::quat(glm::radians(glm::vec3(angle, angle, -90.0f)));
+  angle += 0.4f;
+  scene.gameObjects[0].rotation =
+      glm::quat(glm::radians(glm::vec3(angle, angle, -90.0f)));
 
   gui.draw();
   window.swapBuffers();

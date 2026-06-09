@@ -13,8 +13,8 @@ public:
   void draw(const Scene &_scene) override;
   std::shared_ptr<Texture> createTexture(const std::string &path) override;
   std::shared_ptr<Mesh> createMesh(const std::string &path) override;
-  std::shared_ptr<Pipeline> createPipeline(const std::string &vert,
-                                           const std::string &frag) override;
+  std::shared_ptr<Pipeline>
+  createPipeline(const std::vector<std::string> &shaderPaths) override;
 
 private:
   GLuint lightSSBO = 0;

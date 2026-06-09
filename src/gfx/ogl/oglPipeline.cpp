@@ -1,8 +1,7 @@
 #include "oglPipeline.h"
 
-OGLPipeline::OGLPipeline(const std::string &vertexPath,
-                         const std::string &fragmentPath)
-    : shader(vertexPath, fragmentPath) {};
+OGLPipeline::OGLPipeline(const std::vector<std::string> &shaderPaths)
+    : shader(shaderPaths) {};
 
 void OGLPipeline::bind() {
   depthTest ? glEnable(GL_DEPTH_TEST) : glDisable(GL_DEPTH_TEST);

@@ -8,15 +8,16 @@ loadIfProvided(Render &renderer, const std::string &path) {
   return renderer.createTexture(path);
 }
 
-Material::Material(Render &renderer, const std::string &vertexPath,
-                   const std::string &fragmentPath,
+Material::Material(Render &renderer,
+                   const std::vector<std::string> &shaderPaths,
+
                    const std::string &diffusePath,
                    const std::string &specularPath,
                    const std::string &emissionPath,
                    const std::string &normalPath, const glm::vec3 &_diffuseTint,
                    const glm::vec3 &_specularTint,
                    const glm::vec3 &_emissionTint)
-    : pipeline(renderer.createPipeline(vertexPath, fragmentPath)),
+    : pipeline(renderer.createPipeline(shaderPaths)),
       diffuseMap(loadIfProvided(renderer, diffusePath)),
       specularMap(loadIfProvided(renderer, specularPath)),
       emissionMap(loadIfProvided(renderer, emissionPath)),

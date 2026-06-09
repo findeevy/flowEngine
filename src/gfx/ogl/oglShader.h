@@ -3,10 +3,12 @@
 #include <glad/gl.h>
 #include <glm/glm.hpp>
 
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <vector>
 
 #include "../../utils/logger.h"
 #include "../shader.h"
@@ -15,7 +17,7 @@ class OGLShader : public Shader {
 public:
   unsigned int id;
 
-  OGLShader(const std::string &vertexPath, const std::string &fragmentPath);
+  OGLShader(const std::vector<std::string> &shaderPaths);
   void bind() override;
 
   void setBool(const std::string &name, bool value) override;
