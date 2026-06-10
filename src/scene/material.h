@@ -8,27 +8,19 @@
 #include "../gfx/pipeline.h"
 #include "../gfx/texture.h"
 
+#include <variant>
+
+using UniformValue = std::variant<int, float, bool, glm::vec2, glm::vec3, glm::vec4, glm::mat2, glm::mat3, glm::mat4>;
+
+
 class Render;
 
 class Material {
 public:
   std::shared_ptr<Pipeline> pipeline;
+  std::map<std::string, std::shared_ptr<Texture>> textures;
+  std::map<std::string, UniformValue> uniforms;
 
-  std::optional<std::shared_ptr<Texture>> diffuseMap;
-  std::optional<std::shared_ptr<Texture>> specularMap;
-  std::optional<std::shared_ptr<Texture>> emissionMap;
-
-  glm::vec3 diffuseTint{1.0f, 1.0f, 1.0f};
-  glm::vec3 specularTint{1.0f, 1.0f, 1.0f};
-  glm::vec3 emissionTint{1.0f, 1.0f, 1.0f};
-
-  std::optional<std::shared_ptr<Texture>> normalMap;
-
-public:
   Material(Render &renderer, const std::vector<std::string> &shaderPaths,
-           const std::string &diffusePath, const std::string &specularPath,
-           const std::string &emissionPath, const std::string &normalPath,
-           const glm::vec3 &diffuseTint = glm::vec3(1),
-           const glm::vec3 &specularTint = glm::vec3(1),
-           const glm::vec3 &emissionTint = glm::vec3(0));
+           const std::map<std::string, std::shared_ptr<Texture>> &texturesInput, const &std::map<std::string, UniformValue> uniforms);
 };
