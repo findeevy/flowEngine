@@ -18,15 +18,33 @@ void FlowEngine::init() {
 
   LOG_EVENT("FlowEngine started");
 
+  auto diffuse = renderer->createTexture("assets/Albedo.jpg");
+  auto specular = renderer->createTexture("assets/Specular.jpg");
+  auto normal = renderer->createTexture("assets/Normal.jpg");
+
+  std::map<std::string, std::shared_ptr<Texture>> textures = {
+      {"diffuseMap", diffuse},
+      {"specularMap", specular},
+      {"normalMap", normal},
+  };
+
+  std::map<std::string, UniformValue> uniforms = {
+      {"diffuseTint", glm::vec3(1.0f)},
+      {"specularTint", glm::vec3(1.0f)},
+      {"emissionTint", glm::vec3(0.0f)},
+      {"hasDiffuse", true},
+      {"hasSpecular", true},
+      {"hasEmission", false},
+      {"hasNormal", true},
+  };
+
   Material mat(*renderer,
                {"shaders/glsl/base.vert", "shaders/glsl/bayerDither.frag"},
-               "assets/Albedo.jpg", "assets/Specular.jpg", "",
-               "assets/Normal.jpg", glm::vec3(1), glm::vec3(1), glm::vec3(0));
+               textures, uniforms);
 
   Material matp(*renderer,
                 {"shaders/glsl/base.vert", "shaders/glsl/blinnPhong.frag"},
-                "assets/Albedo.jpg", "assets/Specular.jpg", "",
-                "assets/Normal.jpg", glm::vec3(1), glm::vec3(1), glm::vec3(0));
+                textures, uniforms);
 
   auto mesh = renderer->createMesh("assets/Barrel.obj");
   GameObject barrel("test", mesh, mat, {-1.0f, -1.0f, -30.0f},

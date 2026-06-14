@@ -1,17 +1,17 @@
 #pragma once
 
-#include <glm/vec3.hpp>
+#include <glm/glm.hpp>
+#include <map>
 #include <memory>
-#include <optional>
 #include <string>
+#include <variant>
+#include <vector>
 
 #include "../gfx/pipeline.h"
 #include "../gfx/texture.h"
 
-#include <variant>
-
-using UniformValue = std::variant<int, float, bool, glm::vec2, glm::vec3, glm::vec4, glm::mat2, glm::mat3, glm::mat4>;
-
+using UniformValue = std::variant<int, float, bool, glm::vec2, glm::vec3,
+                                  glm::vec4, glm::mat2, glm::mat3, glm::mat4>;
 
 class Render;
 
@@ -22,5 +22,6 @@ public:
   std::map<std::string, UniformValue> uniforms;
 
   Material(Render &renderer, const std::vector<std::string> &shaderPaths,
-           const std::map<std::string, std::shared_ptr<Texture>> &texturesInput, const &std::map<std::string, UniformValue> uniforms);
+           const std::map<std::string, std::shared_ptr<Texture>> &texturesInput,
+           const std::map<std::string, UniformValue> &uniforms);
 };
