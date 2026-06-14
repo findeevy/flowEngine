@@ -64,10 +64,9 @@ void OGLRender::draw(const Scene &_scene) {
   int frameWidth;
   int frameHeight;
   glfwGetFramebufferSize(glfwGetCurrentContext(), &frameWidth, &frameHeight);
-  glm::mat4 proj =
-      glm::perspective(glm::radians(_scene.camera.fov),
-                       (float)frameWidth / (float)frameHeight,
-                       _scene.camera.nearClip, _scene.camera.farClip);
+  glm::mat4 proj = glm::perspective(
+      glm::radians(_scene.camera.fov), (float)frameWidth / (float)frameHeight,
+      _scene.camera.nearClip, _scene.camera.farClip);
 
   for (const auto &object : _scene.gameObjects) {
     glm::mat4 model = glm::translate(glm::mat4(1.0f), object.position) *
@@ -81,38 +80,40 @@ void OGLRender::draw(const Scene &_scene) {
     pipeline->shader.setMat4("proj", proj);
     pipeline->shader.setVec3("viewPosition", _scene.camera.position);
 
-    pipeline->shader.setVec3("diffuseTint", object.material->diffuseTint);
-    pipeline->shader.setVec3("specularTint", object.material->specularTint);
-    pipeline->shader.setVec3("emissionTint", object.material->emissionTint);
-
     auto &mat = *object.material;
-    if (mat.diffuseMap.has_value()) {
-      mat.diffuseMap.value()->bind(0);
-      pipeline->shader.setInt("diffuseMap", 0);
-      pipeline->shader.setBool("hasDiffuse", true);
-    } else {
-      pipeline->shader.setBool("hasDiffuse", false);
+
+    for (auto const &[key, val] : mat.uniforms) {
+      std::visit(
+          [&](auto const &value) {
+            using T = std::decay_t<decltype(value)>;
+
+            if constexpr (std::is_same_v<T, int>)
+              pipeline->shader.setInt(key, value);
+            else if constexpr (std::is_same_v<T, float>)
+              pipeline->shader.setFloat(key, value);
+            else if constexpr (std::is_same_v<T, bool>)
+              pipeline->shader.setBool(key, value);
+            else if constexpr (std::is_same_v<T, glm::vec2>)
+              pipeline->shader.setVec2(key, value);
+            else if constexpr (std::is_same_v<T, glm::vec3>)
+              pipeline->shader.setVec3(key, value);
+            else if constexpr (std::is_same_v<T, glm::vec4>)
+              pipeline->shader.setVec4(key, value);
+            else if constexpr (std::is_same_v<T, glm::mat2>)
+              pipeline->shader.setMat2(key, value);
+            else if constexpr (std::is_same_v<T, glm::mat3>)
+              pipeline->shader.setMat3(key, value);
+            else if constexpr (std::is_same_v<T, glm::mat4>)
+              pipeline->shader.setMat4(key, value);
+          },
+          val);
     }
-    if (mat.specularMap.has_value()) {
-      mat.specularMap.value()->bind(1);
-      pipeline->shader.setInt("specularMap", 1);
-      pipeline->shader.setBool("hasSpecular", true);
-    } else {
-      pipeline->shader.setBool("hasSpecular", false);
-    }
-    if (mat.emissionMap.has_value()) {
-      mat.emissionMap.value()->bind(2);
-      pipeline->shader.setInt("emissionMap", 2);
-      pipeline->shader.setBool("hasEmission", true);
-    } else {
-      pipeline->shader.setBool("hasEmission", false);
-    }
-    if (mat.normalMap.has_value()) {
-      mat.normalMap.value()->bind(3);
-      pipeline->shader.setInt("normalMap", 3);
-      pipeline->shader.setBool("hasNormal", true);
-    } else {
-      pipeline->shader.setBool("hasNormal", false);
+
+    int textureBind = 0;
+    for (auto const &[key, val] : mat.textures) {
+      val->bind(textureBind);
+      pipeline->shader.setInt(key, textureBind);
+      textureBind++;
     }
 
     object.mesh->draw();
