@@ -1,5 +1,7 @@
 #include "scene.h"
 
 Scene::Scene(const Camera &_camera, const std::vector<GameObject> &_gameObjects,
-             const std::vector<PointLight> &_pointLights)
-    : camera(_camera), gameObjects(_gameObjects), pointLights(_pointLights) {}
+             const std::vector<PointLight> &_pointLights,
+             const std::vector<DirectionalLight> &_directionalLights)
+    : camera(_camera), gameObjects(_gameObjects), pointLights(_pointLights),
+      directionalLights(_directionalLights) {}

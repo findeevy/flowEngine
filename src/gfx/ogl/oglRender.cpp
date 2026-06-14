@@ -41,21 +41,38 @@ void OGLRender::draw(const Scene &_scene) {
         OGLPointLight{light.color, light.position, 0.0f});
   }
 
+  std::vector<OGLDirectionalLight> oglDirectionalLights;
+  for (const auto &light : _scene.directionalLights) {
+    oglDirectionalLights.emplace_back(
+        OGLDirectionalLight{light.color, light.direction, 0.0f});
+  }
+
   struct SSBOHeader {
-    int lightCount;
-    int _pad[3];
+    int pointLightCount;
+    int directionalLightCount;
+    int _pad[2];
   } header;
-  header.lightCount = (int)oglPointLights.size();
+  header.pointLightCount = (int)oglPointLights.size();
+  header.directionalLightCount = (int)oglDirectionalLights.size();
 
   glBindBuffer(GL_SHADER_STORAGE_BUFFER, lightSSBO);
+ 
   glBufferData(GL_SHADER_STORAGE_BUFFER,
                sizeof(SSBOHeader) +
-                   oglPointLights.size() * sizeof(OGLPointLight),
+                   oglPointLights.size() * sizeof(OGLPointLight)
+		   + oglDirectionalLights.size() * sizeof(OGLDirectionalLight),
                nullptr, GL_DYNAMIC_DRAW);
+ 
   glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(SSBOHeader), &header);
+ 
   glBufferSubData(GL_SHADER_STORAGE_BUFFER, sizeof(SSBOHeader),
                   oglPointLights.size() * sizeof(OGLPointLight),
                   oglPointLights.data());
+  
+    glBufferSubData(GL_SHADER_STORAGE_BUFFER, sizeof(SSBOHeader )+ oglPointLights.size() * sizeof(OGLPointLight),
+                  oglDirectionalLights.size() * sizeof(OGLDirectionalLight),
+                  oglDirectionalLights.data());
+
   glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, lightSSBO);
 
   glm::mat4 view = glm::mat4_cast(glm::inverse(_scene.camera.rotation)) *
