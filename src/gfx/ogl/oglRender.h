@@ -3,6 +3,7 @@
 #include "../render.h"
 #include "oglPipeline.h"
 #include "oglPointLight.h"
+#include "oglDirectionalLight.h"
 #include "oglRender.h"
 
 #include <glad/gl.h>
