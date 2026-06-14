@@ -4,7 +4,7 @@ OGLShader::OGLShader(const std::vector<std::string> &shaderPaths) {
   id = glCreateProgram();
   std::vector<unsigned> shaders;
 
-  for (int i = 0; i < shaderPaths.size(); i++) {
+  for (size_t i = 0; i < shaderPaths.size(); i++) {
     std::string shaderPath = shaderPaths[i];
     std::string shaderStr;
     std::ifstream shaderFile;
@@ -62,7 +62,7 @@ OGLShader::OGLShader(const std::vector<std::string> &shaderPaths) {
   glLinkProgram(id);
   checkCompileErrors(id, "PROGRAM");
 
-  for (int i = 0; i < shaders.size(); i++) {
+  for (size_t i = 0; i < shaders.size(); i++) {
     glDeleteShader(shaders[i]);
   }
 }

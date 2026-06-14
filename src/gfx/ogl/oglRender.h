@@ -1,9 +1,9 @@
 #pragma once
 
 #include "../render.h"
+#include "oglDirectionalLight.h"
 #include "oglPipeline.h"
 #include "oglPointLight.h"
-#include "oglDirectionalLight.h"
 #include "oglRender.h"
 
 #include <glad/gl.h>
@@ -18,5 +18,6 @@ public:
   createPipeline(const std::vector<std::string> &shaderPaths) override;
 
 private:
-  GLuint lightSSBO = 0;
+  GLuint pointLightSSBO = 0;
+  GLuint directionalLightSSBO = 0;
 };
