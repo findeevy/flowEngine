@@ -17,6 +17,7 @@ OGLRender::OGLRender() {
   glEnable(GL_DEPTH_TEST);
   glGenBuffers(1, &pointLightSSBO);
   glGenBuffers(1, &directionalLightSSBO);
+  glGenBuffers(1, &spotLightSSBO);
 }
 
 std::shared_ptr<Texture> OGLRender::createTexture(const std::string &path) {
@@ -46,6 +47,12 @@ void OGLRender::draw(const Scene &_scene) {
   for (const auto &light : _scene.directionalLights) {
     oglDirectionalLights.emplace_back(
         OGLDirectionalLight{light.color, light.direction, 0.0f});
+  }
+
+  std::vector<OGLSpotLight> oglSpotLights;
+  for (const auto &light : _scene.spotLights) {
+    oglSpotLights.emplace_back(
+        OGLSpotLight{light.color, light.direction, 1.0f});
   }
 
   struct PointLightHead {
@@ -91,6 +98,28 @@ void OGLRender::draw(const Scene &_scene) {
                   oglDirectionalLights.data());
 
   glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, directionalLightSSBO);
+
+  struct SpotLightHead {
+    int spotLightCount;
+    int _pad[3];
+  } spotLightHeader;
+  spotLightHeader.spotLightCount = (int)oglSpotLights.size();
+
+  glBindBuffer(GL_SHADER_STORAGE_BUFFER, spotLightSSBO);
+
+  glBufferData(GL_SHADER_STORAGE_BUFFER,
+               sizeof(SpotLightHead) +
+                   oglSpotLights.size() * sizeof(OGLSpotLight),
+               nullptr, GL_DYNAMIC_DRAW);
+
+  glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(SpotLightHead),
+                  &spotLightHeader);
+
+  glBufferSubData(GL_SHADER_STORAGE_BUFFER, sizeof(SpotLightHead),
+                  oglSpotLights.size() * sizeof(OGLSpotLight),
+                  oglSpotLights.data());
+
+  glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, spotLightSSBO);
 
   glm::mat4 view = glm::mat4_cast(glm::inverse(_scene.camera.rotation)) *
                    glm::translate(glm::mat4(1.0f), -_scene.camera.position);
