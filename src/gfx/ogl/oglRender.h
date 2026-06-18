@@ -5,6 +5,7 @@
 #include "oglPipeline.h"
 #include "oglPointLight.h"
 #include "oglRender.h"
+#include "oglSpotLight.h"
 
 #include <glad/gl.h>
 
@@ -20,4 +21,5 @@ public:
 private:
   GLuint pointLightSSBO = 0;
   GLuint directionalLightSSBO = 0;
+  GLuint spotLightSSBO = 0;
 };
