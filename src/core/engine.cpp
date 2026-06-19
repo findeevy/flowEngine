@@ -61,11 +61,13 @@ void FlowEngine::init() {
   dirLight.color = {1.0f, 0.0f, 0.0f, 40.0f};
   dirLight.direction = {-2.0f, -1.0f, -2.0f};
 
+  SpotLight spotLight;
+
   Camera cam;
   cam.position = {0.0f, 0.0f, 0.0f};
   cam.rotation = glm::quat(1, 0, 0, 0);
 
-  scene = Scene(cam, {barrel, barr}, {light}, {dirLight});
+  scene = Scene(cam, {barrel, barr}, {light}, {dirLight}, {spotLight});
 
   network.detectHostIp();
 }
