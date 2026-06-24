@@ -32,14 +32,15 @@ struct DirectionalLight {
 };
 
 struct SpotLight {
-  glm::vec4 color;
-  glm::vec3 direction;
-  float innerCutoff;
-  float outerCutoff;
+  vec4 color;
+  vec3 direction;
+  float innerCutOff;
+  vec3 position;
+  float outerCutOff;
   float constant;
   float linear;
   float quadratic;
-}
+};
 
 layout(std430, binding = 0) buffer PointLightBlock {
     int pointLightCount;
@@ -55,7 +56,7 @@ layout(std430, binding = 1) buffer DirectionalLightBlock {
 
 layout(std430, binding = 2) buffer SpotLightBlock {
     int spotLightCount;
-    int _dpad[3];
+    int _spad[3];
     SpotLight spotLights[];
 };
 
@@ -126,9 +127,9 @@ void main() {
         float radius = spotLights[i].color.a;
 
 
-        float theta = dot(lightDir, normalize(-spotLight[i].direction)); 
-        float epsilon = (spotLight[i].innerCutOff - spotLight[i].outerCutOff);
-        float fallout = clamp((theta - spotLight[i].outerCutOff) / epsilon, 0.0, 1.0);
+        float theta = dot(lightDir, normalize(-spotLights[i].direction)); 
+        float epsilon = (spotLights[i].innerCutOff - spotLights[i].outerCutOff);
+        float fallout = clamp((theta - spotLights[i].outerCutOff) / epsilon, 0.0, 1.0);
 
 
 
@@ -140,8 +141,7 @@ void main() {
             : 0.0;
 
         vec3 specularContrib = specScalar * spotLights[i].color.rgb * fallout;
-        float lightDistance = length(pointLights[i].position - fragPos);
-	float attenuation = 1.0 / (spotLight.constant + spotLight.linear * lightDistance + spotLight.quadratic * (lightDistance * lightDistance));
+	float attenuation = 1.0 / (spotLights[i].constant + spotLights[i].linear * lightDistance + spotLights[i].quadratic * (lightDistance * lightDistance));
 
         accDiffuse += diffuseContrib * attenuation;
         accSpecular += specularContrib * attenuation;

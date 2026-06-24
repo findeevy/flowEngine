@@ -51,8 +51,9 @@ void OGLRender::draw(const Scene &_scene) {
 
   std::vector<OGLSpotLight> oglSpotLights;
   for (const auto &light : _scene.spotLights) {
-    oglSpotLights.emplace_back(
-        OGLSpotLight{light.color, light.direction, 1.0f});
+    oglSpotLights.emplace_back(OGLSpotLight{
+        light.color, light.direction, light.innerCutoff, light.position,
+        light.outerCutoff, light.constant, light.linear, light.quadratic});
   }
 
   struct PointLightHead {
