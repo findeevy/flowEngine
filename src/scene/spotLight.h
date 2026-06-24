@@ -10,6 +10,9 @@ public:
   // location
   glm::vec3 direction{0.0f, 0.0f, 0.0f};
   float innerCutoff = 1.0f;
+
+  glm::vec3 position{0.0f, 0.0f, 0.0f};
+
   float outerCutoff = 1.0f;
 
   float constant = 1.0f;
