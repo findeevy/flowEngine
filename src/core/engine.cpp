@@ -18,41 +18,42 @@ void FlowEngine::init() {
 
   LOG_EVENT("FlowEngine started");
 
-  auto diffuse = renderer->createTexture("assets/Albedo.jpg");
-  auto specular = renderer->createTexture("assets/Specular.jpg");
+  auto albedo = renderer->createTexture("assets/Albedo.jpg");
   auto normal = renderer->createTexture("assets/Normal.jpg");
+  auto metallic = renderer->createTexture("assets/Metallic.jpg");
+  auto roughness = renderer->createTexture("assets/Roughness.jpg");
+  auto ao = renderer->createTexture("assets/AO.jpg");
+  auto emissive = renderer->createTexture("assets/Emissive.jpg");
 
   std::map<std::string, std::shared_ptr<Texture>> textures = {
-      {"diffuseMap", diffuse},
-      {"specularMap", specular},
+      {"albedoMap", albedo},
       {"normalMap", normal},
+      {"metallicMap", metallic},
+      {"roughnessMap", roughness},
+      {"aoMap", ao},
+      {"emissiveMap", emissive},
   };
 
   std::map<std::string, UniformValue> uniforms = {
-      {"diffuseTint", glm::vec3(1.0f)},
-      {"specularTint", glm::vec3(1.0f)},
-      {"emissionTint", glm::vec3(0.0f)},
-      {"hasDiffuse", true},
-      {"hasSpecular", true},
-      {"hasEmission", false},
+      {"albedoTint", glm::vec3(1.0f)},
+      {"emissiveTint", glm::vec3(0.0f)},
+      {"metallicFactor", 1.0f},
+      {"roughnessFactor", 1.0f},
+      {"hasAlbedo", true},
       {"hasNormal", true},
+      {"hasMetallic", true},
+      {"hasRoughness", true},
+      {"hasAO", true},
+      {"hasEmissive", false},
   };
 
   Material mat(*renderer,
-               {"shaders/glsl/base.vert", "shaders/glsl/bayerDither.frag"},
+               {"shaders/glsl/base.vert", "shaders/glsl/cookTorrancePBR.frag"},
                textures, uniforms);
-
-  Material matp(*renderer,
-                {"shaders/glsl/base.vert", "shaders/glsl/blinnPhong.frag"},
-                textures, uniforms);
 
   auto mesh = renderer->createMesh("assets/Barrel.obj");
   GameObject barrel("test", mesh, mat, {-1.0f, -1.0f, -30.0f},
                     glm::quat(glm::radians(glm::vec3(-90.0f, 0.0f, -90.0f))));
-
-  GameObject barr("testu", mesh, matp, {-5.0f, -1.0f, -30.0f},
-                  glm::quat(glm::radians(glm::vec3(-90.0f, 0.0f, -90.0f))));
-
   PointLight light;
   light.color = {1.0f, 1.0f, 1.0f, 50.0f};
   light.position = {2.0f, 2.0f, 0.0f};

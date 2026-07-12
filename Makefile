@@ -62,7 +62,7 @@ include/imgui/%.o: include/imgui/%.cpp
 include/imgui/backends/%.o: include/imgui/backends/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 format:
-	find $(FORMAT_DIR) -type f \( -name "*.cpp" -o -name "*.h" -o -name "*.glsl" \) \
+	find $(FORMAT_DIR) -type f \( -name "*.cpp" -o -name "*.h" -o -name "*.glsl" -o -name "*.frag" -o -name "*.vert" -o -name "*.geom" -o -name "*.comp" -o -name "*.ctrl" -o -name "*.eval" \) \
 	    -exec $(CLANG_FORMAT) -i -style=$(FORMAT_STYLE) {} +
 clean:
 	$(RM) $(TARGET) $(OBJS) $(C_OBJS) $(LOG)
