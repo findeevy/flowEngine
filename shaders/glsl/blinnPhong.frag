@@ -3,6 +3,7 @@
 in vec3 fragPos;
 in vec3 fragNormal;
 in vec2 fragTexCoord;
+in mat3 TBN;
 
 uniform vec3 viewPosition;
 uniform sampler2D diffuseMap;
@@ -68,9 +69,13 @@ void main() {
       hasSpecular ? texture(specularMap, fragTexCoord) : vec4(1.0);
   vec4 emission = hasEmission ? texture(emissionMap, fragTexCoord) : vec4(0.0);
 
-  vec3 normal =
-      hasNormal ? normalize(texture(normalMap, fragTexCoord).rgb * 2.0 - 1.0)
-                : normalize(fragNormal);
+  vec3 normal;
+  if (hasNormal) {
+    vec3 sampledNormal = texture(normalMap, fragTexCoord).rgb * 2.0 - 1.0;
+    normal = normalize(TBN * sampledNormal);
+  } else {
+    normal = normalize(fragNormal);
+  }
 
   vec3 viewDirection = normalize(viewPosition - fragPos);
 
@@ -144,8 +149,7 @@ void main() {
   }
 
   vec3 litColor = (diffuseTex.rgb * diffuseTint * accDiffuse) +
-                  (specularTex.rgb * specularTint * accSpecular) +
-                  (emission.rgb * emissionTint);
+                  (specularTex.rgb * specularTint * accSpecular) + emission.rgb;
 
   fragColor = vec4(litColor, diffuseTex.a);
 }

@@ -18,12 +18,21 @@ void FlowEngine::init() {
 
   LOG_EVENT("FlowEngine started");
 
-  auto albedo = renderer->createTexture("assets/Albedo.jpg");
-  auto normal = renderer->createTexture("assets/Normal.jpg");
-  auto metallic = renderer->createTexture("assets/Metallic.jpg");
-  auto roughness = renderer->createTexture("assets/Roughness.jpg");
-  auto ao = renderer->createTexture("assets/AO.jpg");
-  auto emissive = renderer->createTexture("assets/Emissive.jpg");
+  auto albedo =
+      renderer->createTexture("assets/Vintage_Wooden_Barrel_4k_Albedo.jpg");
+
+  auto normal = renderer->createTexture(
+      "assets/Vintage_Wooden_Barrel_4k_Normal_OpenGL.jpg");
+
+  auto metallic =
+      renderer->createTexture("assets/Vintage_Wooden_Barrel_4k_Metallic.jpg");
+
+  auto roughness =
+      renderer->createTexture("assets/Vintage_Wooden_Barrel_4k_Roughness.jpg");
+
+  auto ao = renderer->createTexture("assets/Vintage_Wooden_Barrel_4k_AO.jpg");
+
+  std::shared_ptr<Texture> emissive;
 
   std::map<std::string, std::shared_ptr<Texture>> textures = {
       {"albedoMap", albedo},
@@ -31,36 +40,42 @@ void FlowEngine::init() {
       {"metallicMap", metallic},
       {"roughnessMap", roughness},
       {"aoMap", ao},
-      {"emissiveMap", emissive},
   };
 
   std::map<std::string, UniformValue> uniforms = {
       {"albedoTint", glm::vec3(1.0f)},
       {"emissiveTint", glm::vec3(0.0f)},
+
       {"metallicFactor", 1.0f},
       {"roughnessFactor", 1.0f},
+
       {"hasAlbedo", true},
       {"hasNormal", true},
       {"hasMetallic", true},
       {"hasRoughness", true},
       {"hasAO", true},
       {"hasEmissive", false},
+
+      {"ambientLight", glm::vec3(0.03f)},
   };
 
   Material mat(*renderer,
-               {"shaders/glsl/base.vert", "shaders/glsl/cookTorrancePBR.frag"},
+               {
+                   "shaders/glsl/base.vert",
+                   "shaders/glsl/cookTorrancePBR.frag",
+               },
                textures, uniforms);
 
-  auto mesh = renderer->createMesh("assets/Barrel.obj");
-  GameObject barrel("test", mesh, mat, {-1.0f, -1.0f, -30.0f},
+  auto mesh = renderer->createMesh("assets/Vintage_Wooden_Barrel.obj");
+
+  GameObject barrel("Barrel", mesh, mat, {0.0f, 0.0f, 0.0f},
                     glm::quat(glm::radians(glm::vec3(-90.0f, 0.0f, -90.0f))));
+
   PointLight light;
   light.color = {1.0f, 1.0f, 1.0f, 50.0f};
-  light.position = {2.0f, 2.0f, 0.0f};
+  light.position = {-1.0f, -1.0f, 0.0f};
 
   DirectionalLight dirLight;
-  dirLight.color = {1.0f, 0.0f, 0.0f, 40.0f};
-  dirLight.direction = {-2.0f, -1.0f, -2.0f};
 
   SpotLight spotLight;
 
@@ -68,7 +83,7 @@ void FlowEngine::init() {
   cam.position = {0.0f, 0.0f, 0.0f};
   cam.rotation = glm::quat(1, 0, 0, 0);
 
-  scene = Scene(cam, {barrel, barr}, {light}, {dirLight}, {spotLight});
+  scene = Scene(cam, {barrel}, {light}, {dirLight}, {spotLight});
 
   network.detectHostIp();
 }

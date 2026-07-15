@@ -1,5 +1,7 @@
 #include "mesh.h"
 
+#include <unordered_map>
+
 Mesh::Mesh(const std::string filePath) {
   tinyobj::attrib_t attrib;
   std::vector<tinyobj::shape_t> shapes;
@@ -36,12 +38,50 @@ Mesh::Mesh(const std::string filePath) {
         vertex.texCoord = {0.0f, 0.0f};
       }
 
+      vertex.tangent = {0.0f, 0.0f, 0.0f};
+
       if (uniqueVertices.count(vertex) == 0) {
         uniqueVertices[vertex] = static_cast<uint32_t>(vertices.size());
         vertices.emplace_back(vertex);
       }
 
       indices.emplace_back(uniqueVertices[vertex]);
+    }
+  }
+
+  computeTangents();
+}
+
+void Mesh::computeTangents() {
+  std::vector<glm::vec3> tangentAccum(vertices.size(), glm::vec3(0.0f));
+
+  for (size_t i = 0; i + 2 < indices.size(); i += 3) {
+    Vertex &v0 = vertices[indices[i]];
+    Vertex &v1 = vertices[indices[i + 1]];
+    Vertex &v2 = vertices[indices[i + 2]];
+
+    glm::vec3 edge1 = v1.position - v0.position;
+    glm::vec3 edge2 = v2.position - v0.position;
+
+    glm::vec2 deltaUV1 = v1.texCoord - v0.texCoord;
+    glm::vec2 deltaUV2 = v2.texCoord - v0.texCoord;
+
+    float denom = deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y;
+    float f = (denom != 0.0f) ? 1.0f / denom : 0.0f;
+
+    glm::vec3 tangent = f * (deltaUV2.y * edge1 - deltaUV1.y * edge2);
+
+    tangentAccum[indices[i]] += tangent;
+    tangentAccum[indices[i + 1]] += tangent;
+    tangentAccum[indices[i + 2]] += tangent;
+  }
+
+  for (size_t i = 0; i < vertices.size(); i++) {
+    glm::vec3 t = tangentAccum[i];
+    if (glm::length(t) > 1e-8f) {
+      vertices[i].tangent = glm::normalize(t);
+    } else {
+      vertices[i].tangent = glm::vec3(1.0f, 0.0f, 0.0f);
     }
   }
 }
