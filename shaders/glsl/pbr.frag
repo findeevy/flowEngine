@@ -149,7 +149,8 @@ void main() {
   }
 
   vec3 litColor = (diffuseTex.rgb * diffuseTint * accDiffuse) +
-                  (specularTex.rgb * specularTint * accSpecular) + emission.rgb;
+                  (specularTex.rgb * specularTint * accSpecular) +
+                  (emission.rgb * emissionTint);
 
   fragColor = vec4(litColor, diffuseTex.a);
 }

@@ -14,4 +14,7 @@ public:
   std::vector<unsigned int> indices;
   virtual void draw() = 0;
   virtual ~Mesh() = default;
+
+private:
+  void computeTangents();
 };

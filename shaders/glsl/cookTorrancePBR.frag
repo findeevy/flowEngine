@@ -3,6 +3,7 @@
 in vec3 fragPos;
 in vec3 fragNormal;
 in vec2 fragTexCoord;
+in mat3 TBN;
 
 uniform vec3 viewPosition;
 
@@ -133,9 +134,13 @@ void main() {
   roughness = clamp(roughness, 0.045, 1.0);
   metallic = clamp(metallic, 0.0, 1.0);
 
-  vec3 normal =
-      hasNormal ? normalize(texture(normalMap, fragTexCoord).rgb * 2.0 - 1.0)
-                : normalize(fragNormal);
+  vec3 normal;
+  if (hasNormal) {
+    vec3 sampledNormal = texture(normalMap, fragTexCoord).rgb * 2.0 - 1.0;
+    normal = normalize(TBN * sampledNormal);
+  } else {
+    normal = normalize(fragNormal);
+  }
 
   vec3 viewDirection = normalize(viewPosition - fragPos);
 

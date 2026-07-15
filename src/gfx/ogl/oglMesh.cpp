@@ -15,18 +15,21 @@ OGLMesh::OGLMesh(const std::string filePath) : Mesh(filePath) {
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int),
                indices.data(), GL_STATIC_DRAW);
 
-  // position
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
                         (void *)offsetof(Vertex, position));
   glEnableVertexAttribArray(0);
-  // normal
+
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
                         (void *)offsetof(Vertex, normal));
   glEnableVertexAttribArray(1);
-  // texcoord
+
   glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex),
                         (void *)offsetof(Vertex, texCoord));
   glEnableVertexAttribArray(2);
+
+  glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex),
+                        (void *)offsetof(Vertex, tangent));
+  glEnableVertexAttribArray(3);
 
   glBindVertexArray(0);
 }
