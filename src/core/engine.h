@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <chrono>
 
 #include "../events/events.h"
 #include "../gfx/render.h"
@@ -23,6 +24,9 @@ private:
 
   // test
   float angle = 0.0f;
+
+  std::chrono::steady_clock::time_point lastFrameTime;
+  float deltaTime = 0.0f;
 
   std::vector<Event> eventQueue;
 

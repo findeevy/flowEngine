@@ -1,8 +1,8 @@
 #pragma once
 
 #include "material.h"
+#include "particle.h"
 
-#include <cstdint>
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <memory>
@@ -12,16 +12,17 @@
 class ParticleSystem {
 public:
   ParticleSystem(const std::string &_name, const Material &_material,
-                 const float lifeSpan const glm::vec3 &_position,
+                 const float &_lifeSpan, const size_t &_maxAmount,
+                 const unsigned &_spawnPerSec, const glm::vec3 &_position,
                  const glm::quat &_rotation);
   // should run every frame
-  void update();
+  void update(const float &dt);
 
   std::string name = "";
   Material material;
   float lifeSpanSec = 10.0f;
-  int maxAmount = 100;
-  int spawnPerSec 10;
+  size_t maxAmount = 100;
+  unsigned spawnPerSec = 10;
   glm::vec3 position{0.0f, 0.0f, 0.0f};
   glm::quat rotation{1.0f, 0.0f, 0.0f, 0.0f};
 
@@ -32,5 +33,8 @@ public:
   void clear();
 
 private:
+  double elapsedTime = 0.0f;
+
+  // particle made up of material + init time to keep track of lifespan?
   std::queue<Particle> particles;
 };

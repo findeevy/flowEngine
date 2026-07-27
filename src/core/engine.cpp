@@ -86,12 +86,18 @@ void FlowEngine::init() {
   scene = Scene(cam, {barrel}, {light}, {dirLight}, {spotLight});
 
   network.detectHostIp();
+
+  lastFrameTime = std::chrono::steady_clock::now();
 }
 
 void FlowEngine::update() {
+  auto now = std::chrono::steady_clock::now();
+  deltaTime = std::chrono::duration<float>(now - lastFrameTime).count();
+  lastFrameTime = now;
+  deltaTime = std::min(deltaTime, 0.5f);
   renderer->draw(scene);
 
-  angle += 0.4f;
+  angle += 60.0f * deltaTime;
   scene.gameObjects[0].rotation =
       glm::quat(glm::radians(glm::vec3(angle, angle, -90.0f)));
 
@@ -121,6 +127,7 @@ void FlowEngine::process() {
         },
         event);
   }
+  scene.update(deltaTime);
   eventQueue.clear();
 }
 
