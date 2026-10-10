@@ -18,6 +18,7 @@ void FlowEngine::init() {
 
   LOG_EVENT("FlowEngine started");
 
+  // TEST CODE
   auto albedo = renderer->createTexture("assets/albedo.jpg");
 
   auto normal = renderer->createTexture("assets/normal.png");
@@ -58,23 +59,27 @@ void FlowEngine::init() {
   Material mat(*renderer,
                {
                    "shaders/glsl/base.vert",
-                   "shaders/glsl/cookTorrancePBR.frag",
+                   "shaders/glsl/base.frag",
                },
                textures, uniforms);
 
   auto mesh = renderer->createMesh("assets/head.obj");
 
-  GameObject barrel("Barrel", mesh, mat, {0.0f, 0.0f, -0.4f},
-                    glm::quat(glm::radians(glm::vec3(-90.0f, 0.0f, -90.0f))));
+  std::vector<GameObject> objs;
+
+  for (float p = -10.0f; p < 10.0f; p++) {
+    for (float i = -10.0f; i < 10.0f; i++) {
+      for (float j = -10.0f; j < 10.0f; j++) {
+        objs.emplace_back(GameObject(
+            "head", mesh, mat, {i / 2.0f, j / 2.0f, (p / 2.0f) - 5.5f},
+            glm::quat(glm::radians(glm::vec3(-90.0f, 0.0f, -90.0f)))));
+      }
+    }
+  }
 
   PointLight light;
-  light.color = {1.0f, 0.7f, 1.0f, 10.0f};
+  light.color = {1.0f, 1.0f, 1.0f, 30.0f};
   light.position = {1.0f, 0.0f, 1.0f};
-
-  PointLight light2;
-  light2.color = {1.0f, 1.0f, 1.0f, 5.0f};
-  light2.position = {0.0f, 1.0f, 1.0f};
-
 
   DirectionalLight dirLight;
 
@@ -84,7 +89,8 @@ void FlowEngine::init() {
   cam.position = {0.0f, 0.0f, 0.0f};
   cam.rotation = glm::quat(1, 0, 0, 0);
 
-  scene = Scene(cam, {barrel}, {light2}, {dirLight}, {spotLight});
+  scene = Scene(cam, objs, {light}, {dirLight}, {spotLight});
+  // TEST CODE
 
   network.detectHostIp();
 
@@ -98,9 +104,12 @@ void FlowEngine::update() {
   deltaTime = std::min(deltaTime, 0.5f);
   renderer->draw(scene);
 
+  // TEST CODE
   angle += 60.0f * deltaTime;
-  scene.gameObjects[0].rotation =
-      glm::quat(glm::radians(glm::vec3(0.0f, angle, 0.0f)));
+  for (GameObject &object : scene.gameObjects) {
+    object.rotation = glm::quat(glm::radians(glm::vec3(0.0f, angle, 0.0f)));
+  }
+  // TEST CODE
 
   gui.draw();
   window.swapBuffers();
@@ -108,6 +117,10 @@ void FlowEngine::update() {
   updateQueue(gui.poll());
 
   process();
+
+  // TEST CODE
+  std::cout << "\r" << 1.0f / deltaTime << std::flush;
+  // TEST CODE
 }
 
 void FlowEngine::updateQueue(std::vector<Event> events) {

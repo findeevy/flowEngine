@@ -6,7 +6,9 @@
 #include <algorithm>
 #include <fstream>
 #include <iostream>
+#include <set>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -33,5 +35,8 @@ public:
   void setMat4(const std::string &name, const glm::mat4 &value) override;
 
 private:
+  static std::string loadShader(const std::string &path,
+                                const std::string &root,
+                                std::set<std::string> &included);
   void checkCompileErrors(GLuint shader, std::string type);
 };
