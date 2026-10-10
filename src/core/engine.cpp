@@ -18,19 +18,16 @@ void FlowEngine::init() {
 
   LOG_EVENT("FlowEngine started");
 
-  auto albedo =
-      renderer->createTexture("assets/Vintage_Wooden_Barrel_4k_Albedo.jpg");
+  // TEST CODE
+  auto albedo = renderer->createTexture("assets/albedo.jpg");
 
-  auto normal = renderer->createTexture(
-      "assets/Vintage_Wooden_Barrel_4k_Normal_OpenGL.jpg");
+  auto normal = renderer->createTexture("assets/normal.png");
 
-  auto metallic =
-      renderer->createTexture("assets/Vintage_Wooden_Barrel_4k_Metallic.jpg");
+  auto metallic = renderer->createTexture("assets/metallic.png");
 
-  auto roughness =
-      renderer->createTexture("assets/Vintage_Wooden_Barrel_4k_Roughness.jpg");
+  auto roughness = renderer->createTexture("assets/roughness.png");
 
-  auto ao = renderer->createTexture("assets/Vintage_Wooden_Barrel_4k_AO.jpg");
+  auto ao = renderer->createTexture("assets/ao.png");
 
   std::shared_ptr<Texture> emissive;
 
@@ -62,18 +59,27 @@ void FlowEngine::init() {
   Material mat(*renderer,
                {
                    "shaders/glsl/base.vert",
-                   "shaders/glsl/cookTorrancePBR.frag",
+                   "shaders/glsl/base.frag",
                },
                textures, uniforms);
 
-  auto mesh = renderer->createMesh("assets/Vintage_Wooden_Barrel.obj");
+  auto mesh = renderer->createMesh("assets/head.obj");
 
-  GameObject barrel("Barrel", mesh, mat, {0.0f, 0.0f, 0.0f},
-                    glm::quat(glm::radians(glm::vec3(-90.0f, 0.0f, -90.0f))));
+  std::vector<GameObject> objs;
+
+  for (float p = -10.0f; p < 10.0f; p++) {
+    for (float i = -10.0f; i < 10.0f; i++) {
+      for (float j = -10.0f; j < 10.0f; j++) {
+        objs.emplace_back(GameObject(
+            "head", mesh, mat, {i / 2.0f, j / 2.0f, (p / 2.0f) - 5.5f},
+            glm::quat(glm::radians(glm::vec3(-90.0f, 0.0f, -90.0f)))));
+      }
+    }
+  }
 
   PointLight light;
-  light.color = {1.0f, 1.0f, 1.0f, 50.0f};
-  light.position = {-1.0f, -1.0f, 0.0f};
+  light.color = {1.0f, 1.0f, 1.0f, 30.0f};
+  light.position = {1.0f, 0.0f, 1.0f};
 
   DirectionalLight dirLight;
 
@@ -83,7 +89,8 @@ void FlowEngine::init() {
   cam.position = {0.0f, 0.0f, 0.0f};
   cam.rotation = glm::quat(1, 0, 0, 0);
 
-  scene = Scene(cam, {barrel}, {light}, {dirLight}, {spotLight});
+  scene = Scene(cam, objs, {light}, {dirLight}, {spotLight});
+  // TEST CODE
 
   network.detectHostIp();
 
@@ -97,9 +104,12 @@ void FlowEngine::update() {
   deltaTime = std::min(deltaTime, 0.5f);
   renderer->draw(scene);
 
+  // TEST CODE
   angle += 60.0f * deltaTime;
-  scene.gameObjects[0].rotation =
-      glm::quat(glm::radians(glm::vec3(angle, angle, -90.0f)));
+  for (GameObject &object : scene.gameObjects) {
+    object.rotation = glm::quat(glm::radians(glm::vec3(0.0f, angle, 0.0f)));
+  }
+  // TEST CODE
 
   gui.draw();
   window.swapBuffers();
@@ -107,6 +117,10 @@ void FlowEngine::update() {
   updateQueue(gui.poll());
 
   process();
+
+  // TEST CODE
+  std::cout << "\r" << 1.0f / deltaTime << std::flush;
+  // TEST CODE
 }
 
 void FlowEngine::updateQueue(std::vector<Event> events) {

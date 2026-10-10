@@ -1,5 +1,42 @@
 #include "oglShader.h"
 
+// recursive include for glsl shaders, great for modularization :)
+std::string OGLShader::loadShader(const std::string &path,
+                                  const std::string &root,
+                                  std::set<std::string> &included) {
+  if (included.count(path))
+    return "";
+  included.insert(path);
+
+  std::ifstream file(path);
+  if (!file)
+    LOG_EVENT("Can't open shader file: " + path);
+
+  size_t slash = path.find_last_of("/\\");
+  std::string dir =
+      (slash == std::string::npos) ? "" : path.substr(0, slash + 1);
+
+  std::string result, line;
+  while (std::getline(file, line)) {
+    size_t start = line.find_first_not_of(" \t");
+    if (start != std::string::npos && line.compare(start, 8, "#include") == 0) {
+      size_t q1 = line.find('"', start);
+      size_t q2 = line.find('"', q1 + 1);
+      if (q1 == std::string::npos || q2 == std::string::npos)
+        LOG_EVENT("Bad #include in " + path + " on line " + line);
+
+      std::string inc = line.substr(q1 + 1, q2 - q1 - 1);
+      std::string incPath = (inc[0] == '/') ? root + inc : dir + inc;
+
+      result += loadShader(incPath, root, included);
+      result += "\n";
+    } else {
+      result += line + "\n";
+    }
+  }
+  return result;
+}
+
 OGLShader::OGLShader(const std::vector<std::string> &shaderPaths) {
   id = glCreateProgram();
   std::vector<unsigned> shaders;
@@ -11,14 +48,14 @@ OGLShader::OGLShader(const std::vector<std::string> &shaderPaths) {
     shaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 
     try {
-      shaderFile.open(shaderPath);
-
-      std::stringstream shaderStream;
-      shaderStream << shaderFile.rdbuf();
-
-      shaderStr = shaderStream.str();
-    } catch (const std::ifstream::failure &e) {
+      size_t slash = shaderPath.find_last_of("/\\");
+      std::string root =
+          (slash == std::string::npos) ? "" : shaderPath.substr(0, slash);
+      std::set<std::string> included;
+      shaderStr = loadShader(shaderPath, root, included);
+    } catch (const std::exception &e) {
       LOG_EVENT(e.what());
+      continue;
     }
 
     const char *shaderCode = shaderStr.c_str();
@@ -45,6 +82,11 @@ OGLShader::OGLShader(const std::vector<std::string> &shaderPaths) {
     } else if (extension == "eval") {
       shaderType = GL_TESS_EVALUATION_SHADER;
       shaderName = "EVALUATION";
+    } else if (extension == "glsl") {
+      LOG_EVENT(shaderPath +
+                " is marked glsl, this should be used as a called function (or "
+                "set of functions) in another shader, not used directly.");
+      return;
     } else {
       LOG_EVENT(shaderPath + " is an unknown type.");
       return;
