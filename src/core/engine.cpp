@@ -18,19 +18,15 @@ void FlowEngine::init() {
 
   LOG_EVENT("FlowEngine started");
 
-  auto albedo =
-      renderer->createTexture("assets/Vintage_Wooden_Barrel_4k_Albedo.jpg");
+  auto albedo = renderer->createTexture("assets/albedo.jpg");
 
-  auto normal = renderer->createTexture(
-      "assets/Vintage_Wooden_Barrel_4k_Normal_OpenGL.jpg");
+  auto normal = renderer->createTexture("assets/normal.png");
 
-  auto metallic =
-      renderer->createTexture("assets/Vintage_Wooden_Barrel_4k_Metallic.jpg");
+  auto metallic = renderer->createTexture("assets/metallic.png");
 
-  auto roughness =
-      renderer->createTexture("assets/Vintage_Wooden_Barrel_4k_Roughness.jpg");
+  auto roughness = renderer->createTexture("assets/roughness.png");
 
-  auto ao = renderer->createTexture("assets/Vintage_Wooden_Barrel_4k_AO.jpg");
+  auto ao = renderer->createTexture("assets/ao.png");
 
   std::shared_ptr<Texture> emissive;
 
@@ -66,14 +62,19 @@ void FlowEngine::init() {
                },
                textures, uniforms);
 
-  auto mesh = renderer->createMesh("assets/Vintage_Wooden_Barrel.obj");
+  auto mesh = renderer->createMesh("assets/head.obj");
 
-  GameObject barrel("Barrel", mesh, mat, {0.0f, 0.0f, 0.0f},
+  GameObject barrel("Barrel", mesh, mat, {0.0f, 0.0f, -0.4f},
                     glm::quat(glm::radians(glm::vec3(-90.0f, 0.0f, -90.0f))));
 
   PointLight light;
-  light.color = {1.0f, 1.0f, 1.0f, 50.0f};
-  light.position = {-1.0f, -1.0f, 0.0f};
+  light.color = {1.0f, 0.7f, 1.0f, 10.0f};
+  light.position = {1.0f, 0.0f, 1.0f};
+
+  PointLight light2;
+  light2.color = {1.0f, 1.0f, 1.0f, 5.0f};
+  light2.position = {0.0f, 1.0f, 1.0f};
+
 
   DirectionalLight dirLight;
 
@@ -83,7 +84,7 @@ void FlowEngine::init() {
   cam.position = {0.0f, 0.0f, 0.0f};
   cam.rotation = glm::quat(1, 0, 0, 0);
 
-  scene = Scene(cam, {barrel}, {light}, {dirLight}, {spotLight});
+  scene = Scene(cam, {barrel}, {light2}, {dirLight}, {spotLight});
 
   network.detectHostIp();
 
@@ -99,7 +100,7 @@ void FlowEngine::update() {
 
   angle += 60.0f * deltaTime;
   scene.gameObjects[0].rotation =
-      glm::quat(glm::radians(glm::vec3(angle, angle, -90.0f)));
+      glm::quat(glm::radians(glm::vec3(0.0f, angle, 0.0f)));
 
   gui.draw();
   window.swapBuffers();
