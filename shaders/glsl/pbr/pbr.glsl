@@ -1,20 +1,6 @@
 #include "/constants/pi.glsl"
 #include "/pbr/cookTorrance.glsl"
 
-struct Surface {
-  vec3 normal;
-  vec3 viewDir;
-  vec3 albedo;
-  vec3 F0;
-  float metallic;
-  float roughness;
-};
-
-struct LightSample {
-  vec3 L;
-  vec3 radiance;
-};
-
 vec3 shadeLight(Surface s, LightSample l) {
   float NdotL = max(dot(s.normal, l.L), 0.0);
   if (NdotL <= 0.0)

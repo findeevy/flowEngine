@@ -34,3 +34,17 @@ src/
   core/ (front facing app logic, window interaction, etc)
   events/ (engine wide event queue and processing, the switchboard of the engine)
 ```
+
+---
+
+## Shader Almanac
+You may "#include" GLSL shader files in pipeline shaders to pull in their functions/structs/constants/etc. This provides a modulatized way to write graphics code, made possible by flowEngine's backend graphics pipeline. Check out base.frag to see this in action!
+
+- GLSL <- Function called by pipeline shader
+- COMP <- Compute Shader
+- VERT <- Vertex Shader
+- FRAG <- Pixel Shader
+- GEOM <- Geometry Shader
+- CTRL <- Tesselation Control Shader
+- EVAL <- Tesselation Evaluation Shader
+

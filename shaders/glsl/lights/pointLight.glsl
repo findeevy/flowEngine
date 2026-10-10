@@ -1,4 +1,4 @@
-#include "/pbr/pbr.glsl"
+#include "/lights/lightStructs.glsl"
 
 struct PointLight {
   vec4 color;

@@ -1,4 +1,4 @@
-#include "/pbr/pbr.glsl"
+#include "/lights/lightStructs.glsl"
 
 struct DirectionalLight {
   vec4 color;
