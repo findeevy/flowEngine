@@ -41,6 +41,7 @@
 *.dwo
 
 /src/glad
+/include/json
 /include/KHR
 /include/imgui
 /include/stb

@@ -15,6 +15,14 @@ else
     https://github.com/tinyobjloader/tinyobjloader.git
 fi
 
+if [ -d "json/.git" ]; then                                                                 
+    git -C json pull --ff-only                                                              
+else                       
+    git clone --depth 1 \
+        https://github.com/nlohmann/json.git                                                 
+fi     
+
+
 if [ -d "imgui/.git" ]; then
     git -C imgui pull --ff-only
 else
@@ -26,6 +34,6 @@ sudo pacman -S glad
  
 mkdir -p glad KHR ../src/glad
  
-glad --api gl:core=3.3 --out-path .. c
+glad --api gl:core=4.3 --out-path .. c
  
 mv ../src/gl.c ../src/glad/glad.c
