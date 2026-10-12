@@ -1,0 +1,5 @@
+{
+      "mesh": "assets/head.obj",
+      "material": "headPBR",
+      "script": ""
+}

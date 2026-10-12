@@ -18,79 +18,13 @@ void FlowEngine::init() {
 
   LOG_EVENT("FlowEngine started");
 
-  // TEST CODE
-  auto albedo = renderer->createTexture("assets/albedo.jpg");
-
-  auto normal = renderer->createTexture("assets/normal.png");
-
-  auto metallic = renderer->createTexture("assets/metallic.png");
-
-  auto roughness = renderer->createTexture("assets/roughness.png");
-
-  auto ao = renderer->createTexture("assets/ao.png");
-
-  std::shared_ptr<Texture> emissive;
-
-  std::map<std::string, std::shared_ptr<Texture>> textures = {
-      {"albedoMap", albedo},
-      {"normalMap", normal},
-      {"metallicMap", metallic},
-      {"roughnessMap", roughness},
-      {"aoMap", ao},
-  };
-
-  std::map<std::string, UniformValue> uniforms = {
-      {"albedoTint", glm::vec3(1.0f)},
-      {"emissiveTint", glm::vec3(0.0f)},
-
-      {"metallicFactor", 1.0f},
-      {"roughnessFactor", 1.0f},
-
-      {"hasAlbedo", true},
-      {"hasNormal", true},
-      {"hasMetallic", true},
-      {"hasRoughness", true},
-      {"hasAO", true},
-      {"hasEmissive", false},
-
-      {"ambientLight", glm::vec3(0.03f)},
-  };
-
-  Material mat(*renderer,
-               {
-                   "shaders/glsl/base.vert",
-                   "shaders/glsl/base.frag",
-               },
-               textures, uniforms);
-
-  auto mesh = renderer->createMesh("assets/head.obj");
-
-  std::vector<GameObject> objs;
-
-  for (float p = -10.0f; p < 10.0f; p++) {
-    for (float i = -10.0f; i < 10.0f; i++) {
-      for (float j = -10.0f; j < 10.0f; j++) {
-        objs.emplace_back(GameObject(
-            "head", mesh, mat, {i / 2.0f, j / 2.0f, (p / 2.0f) - 5.5f},
-            glm::quat(glm::radians(glm::vec3(-90.0f, 0.0f, -90.0f)))));
-      }
-    }
+  try {
+    scene = loadScene("example/level.wrld", *renderer);
+    LOG_EVENT("Loaded level");
+  } catch (const std::exception &e) {
+    LOG_EVENT(std::string("Failed to load level: ") + e.what());
+    throw;
   }
-
-  PointLight light;
-  light.color = {1.0f, 1.0f, 1.0f, 30.0f};
-  light.position = {1.0f, 0.0f, 1.0f};
-
-  DirectionalLight dirLight;
-
-  SpotLight spotLight;
-
-  Camera cam;
-  cam.position = {0.0f, 0.0f, 0.0f};
-  cam.rotation = glm::quat(1, 0, 0, 0);
-
-  scene = Scene(cam, objs, {light}, {dirLight}, {spotLight});
-  // TEST CODE
 
   network.detectHostIp();
 

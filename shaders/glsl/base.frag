@@ -6,14 +6,13 @@
 #include "/lights/spotLight.glsl"
 
 // ADD LIGHTING MODEL HERE
-//#include "/phong/phong.glsl"
-//#include "/phong/blinnPhong.glsl"
+// #include "/phong/phong.glsl"
+// #include "/phong/blinnPhong.glsl"
 #include "/pbr/pbr.glsl"
 
-
 // POST PROCESS HERE
-//#include "/post/bayerDither.glsl"
-#//include "/post/invert.glsl"
+// #include "/post/bayerDither.glsl"
+//include "/post/invert.glsl"
 
 in vec3 fragPos;
 in vec3 fragNormal;
@@ -92,7 +91,7 @@ void main() {
 
   vec3 litColor = ambient + Lo + (emissive.rgb * emissiveTint);
 
-  //litColor = invert(litColor);
+  // litColor = invert(litColor);
 
   fragColor = vec4(litColor, albedoTint.r * 0.0 + albedoTex.a);
 }

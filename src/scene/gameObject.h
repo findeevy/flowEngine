@@ -13,7 +13,7 @@
 class GameObject {
 public:
   GameObject(const std::string &_name, std::shared_ptr<Mesh> _mesh,
-             const Material &_material, const glm::vec3 &_position,
+             std::shared_ptr<Material> _material, const glm::vec3 &_position,
              const glm::quat &_rotation);
 
   std::string name = "";

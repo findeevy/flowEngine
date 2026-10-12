@@ -24,6 +24,7 @@ CPP_SRCS := src/main.cpp \
 	src/include.cpp \
         src/core/engine.cpp \
 	src/core/window.cpp \
+	src/core/loader.cpp \
 	src/gfx/render.cpp \
 	src/gfx/mesh.cpp \
 	src/gfx/texture.cpp \

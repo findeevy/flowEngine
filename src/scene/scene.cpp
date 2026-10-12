@@ -1,4 +1,6 @@
 #include "scene.h"
+#include "../utils/logger.h"
+#include <glm/gtc/constants.hpp>
 
 Scene::Scene(const Camera &_camera, const std::vector<GameObject> &_gameObjects,
              const std::vector<PointLight> &_pointLights,

@@ -1,0 +1,50 @@
+{
+  "camera": {
+    "fov": 90,
+    "nearClip": 0.001,
+    "farClip": 1000,
+    "position": [0, 0, 0],
+    "rotation": [1, 0, 0, 0]
+  },
+
+  "materials": {
+    "headPBR": "example/material.grss"
+  },
+
+  "gameObjects": {
+    "head" :{
+      "path": "example/obj.tree",
+      "position": [0, 0, -0.5],
+      "rotation": [-90, 0, -90]}
+  },
+
+  "pointLights": [
+    {
+      "position": [1, 0, 1],
+      "color": [1, 1, 1],
+      "intensity": 30
+    }
+  ],
+
+  "directionalLights": [
+    {
+      "direction": [-0.5, -1, -0.5],
+      "color": [1, 1, 1],
+      "intensity": 0.5
+    }
+  ],
+
+  "spotLights": [
+    {
+      "position": [0, 2, -5.5],
+      "direction": [0, -1, 0],
+      "color": [1, 1, 1],
+      "intensity": 20,
+      "innerAngle": 12.5,
+      "outerAngle": 17.5,
+      "constant": 1.0,
+      "linear": 0.09,
+      "quadratic": 0.032
+    }
+  ]
+}

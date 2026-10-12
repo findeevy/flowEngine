@@ -4,7 +4,7 @@ vec3 shadeLight(Surface s, LightSample l) {
     return vec3(0.0);
 
   vec3 H = normalize(l.L + s.viewDir);
-  float shininess = 1/((s.roughness*s.roughness));
+  float shininess = 1 / ((s.roughness * s.roughness));
   float spec = pow(max(dot(s.normal, H), 0.0), shininess);
 
   vec3 diffuse = s.albedo * lambert;
