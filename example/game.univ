@@ -1,0 +1,7 @@
+{
+  "graphicsAPI": "OpenGL",
+  "screenWidth": 1080,
+  "screenHeight": 1920,
+  "startScene": "example/level.wrld",
+  "projectName": "head"
+}

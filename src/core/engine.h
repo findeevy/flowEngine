@@ -8,6 +8,8 @@
 #include "../gui/gui.h"
 #include "../net/network.h"
 #include "../scene/scene.h"
+#include "loader.h"
+
 #include "window.h"
 
 class FlowEngine {

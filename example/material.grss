@@ -1,0 +1,26 @@
+{
+  "shaders": ["shaders/glsl/base.vert", "shaders/glsl/base.frag"],
+  "textures": {
+    "albedoMap":    "assets/albedo.jpg",
+    "normalMap":    "assets/normal.png",
+    "metallicMap":  "assets/metallic.png",
+    "roughnessMap": "assets/roughness.png",
+    "aoMap":        "assets/ao.png"
+  },
+  "uniforms": {
+    "albedoTint":      { "type": "vec3",  "value": [1, 1, 1] },
+    "emissiveTint":    { "type": "vec3",  "value": [0, 0, 0] },
+
+    "metallicFactor":  { "type": "float", "value": 1.0 },
+    "roughnessFactor": { "type": "float", "value": 1.0 },
+
+    "hasAlbedo":       { "type": "bool",  "value": true },
+    "hasNormal":       { "type": "bool",  "value": true },
+    "hasMetallic":     { "type": "bool",  "value": true },
+    "hasRoughness":    { "type": "bool",  "value": true },
+    "hasAO":           { "type": "bool",  "value": true },
+    "hasEmissive":     { "type": "bool",  "value": false },
+
+    "ambientLight":    { "type": "vec3",  "value": [0.03, 0.03, 0.03] }
+  }
+}
