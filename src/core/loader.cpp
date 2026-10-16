@@ -72,6 +72,33 @@ static std::shared_ptr<Material> loadMaterial(const std::string &filePath,
   }
 }
 
+Project loadProject(const std::string &filePath) {
+  try {
+    if (!hasExtension(filePath, ".univ")) {
+      throw std::runtime_error("Not a .univ file.");
+    }
+
+    std::ifstream file(filePath);
+    if (!file.is_open()) {
+      throw std::runtime_error("Could not open .univ file.");
+    }
+
+    nlohmann::json uniFile;
+    file >> uniFile;
+
+    Project newProject;
+    newProject.graphicsAPI = uniFile.at("graphicsAPI").get<std::string>();
+    newProject.name = uniFile.at("projectName").get<std::string>();
+    newProject.startScene = uniFile.at("startScene").get<std::string>();
+    newProject.width = uniFile.at("screenWidth").get<int>();
+    newProject.height = uniFile.at("screenHeight").get<int>();
+
+    return newProject;
+  } catch (const std::exception &e) {
+    throw std::runtime_error("project " + filePath + ": " + e.what());
+  }
+}
+
 static GameObject loadGameObject(
     const std::string &name, const std::string &filePath, Render &renderer,
     const std::map<std::string, std::shared_ptr<Material>> &materials,
@@ -129,11 +156,10 @@ Scene loadScene(const std::string &filePath, Render &renderer) {
   scene.camera.farClip = camData.at("farClip");
   scene.camera.nearClip = camData.at("nearClip");
   scene.camera.position = vec3At(camData.at("position"));
-  scene.camera.rotation = glm::quat(
-      camData.at("rotation").at(0).get<float>(),
-      camData.at("rotation").at(1).get<float>(),
-      camData.at("rotation").at(2).get<float>(),
-      camData.at("rotation").at(3).get<float>());
+  scene.camera.rotation = glm::quat(camData.at("rotation").at(0).get<float>(),
+                                    camData.at("rotation").at(1).get<float>(),
+                                    camData.at("rotation").at(2).get<float>(),
+                                    camData.at("rotation").at(3).get<float>());
 
   std::map<std::string, std::shared_ptr<Material>> materials;
   for (const auto &[matName, matPath] : sceneFile.at("materials").items()) {
@@ -143,13 +169,12 @@ Scene loadScene(const std::string &filePath, Render &renderer) {
   std::map<std::string, std::shared_ptr<Mesh>> meshes;
   for (const auto &[objName, obj] : sceneFile.at("gameObjects").items()) {
     scene.gameObjects.emplace_back(
-    loadGameObject(objName, obj.at("path").get<std::string>(), renderer,
-                   materials, meshes));
+        loadGameObject(objName, obj.at("path").get<std::string>(), renderer,
+                       materials, meshes));
 
     auto &gameObject = scene.gameObjects.back();
     gameObject.position = vec3At(obj.at("position"));
-    gameObject.rotation =
-        glm::quat(glm::radians(vec3At(obj.at("rotation"))));
+    gameObject.rotation = glm::quat(glm::radians(vec3At(obj.at("rotation"))));
   }
 
   for (const auto &lightData : sceneFile.at("pointLights")) {

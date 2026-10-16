@@ -3,6 +3,7 @@
 #include "../gfx/render.h"
 #include "../scene/scene.h"
 #include "../utils/logger.h"
+#include "project.h"
 
 #include <string>
 
@@ -18,4 +19,5 @@
 
 class Render;
 
+Project loadProject(const std::string &filePath);
 Scene loadScene(const std::string &filePath, Render &renderer);

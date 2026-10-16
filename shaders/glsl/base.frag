@@ -12,7 +12,7 @@
 
 // POST PROCESS HERE
 // #include "/post/bayerDither.glsl"
-//include "/post/invert.glsl"
+// include "/post/invert.glsl"
 
 in vec3 fragPos;
 in vec3 fragNormal;
