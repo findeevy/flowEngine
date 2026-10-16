@@ -10,7 +10,8 @@ void FlowEngine::start() {
 }
 
 void FlowEngine::init() {
-  window.initWindow(1920, 1080, "FlowEngine");
+  Project gameData = loadProject("example/game.univ");
+  window.initWindow(gameData.width, gameData.height, gameData.name.c_str());
 
   renderer = Render::create(RendererBackend::OpenGL);
 
@@ -19,7 +20,7 @@ void FlowEngine::init() {
   LOG_EVENT("FlowEngine started");
 
   try {
-    scene = loadScene("example/level.wrld", *renderer);
+    scene = loadScene(gameData.startScene, *renderer);
     LOG_EVENT("Loaded level");
   } catch (const std::exception &e) {
     LOG_EVENT(std::string("Failed to load level: ") + e.what());
