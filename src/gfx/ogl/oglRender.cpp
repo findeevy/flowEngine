@@ -3,6 +3,7 @@
 #include "oglMesh.h"
 #include "oglPipeline.h"
 #include "oglTexture.h"
+#include "../bindings.h"
 
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
@@ -76,7 +77,7 @@ void OGLRender::draw(const Scene &_scene) {
                   oglPointLights.size() * sizeof(OGLPointLight),
                   oglPointLights.data());
 
-  glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, pointLightSSBO);
+  glBindBufferBase(GL_SHADER_STORAGE_BUFFER, POINT_LIGHTS, pointLightSSBO);
 
   struct DirectionalLightHead {
     int directionalLightCount;
@@ -98,7 +99,7 @@ void OGLRender::draw(const Scene &_scene) {
                   oglDirectionalLights.size() * sizeof(OGLDirectionalLight),
                   oglDirectionalLights.data());
 
-  glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, directionalLightSSBO);
+  glBindBufferBase(GL_SHADER_STORAGE_BUFFER, REN_DIRECT_LIGHTS, directionalLightSSBO);
 
   struct SpotLightHead {
     int spotLightCount;
@@ -120,7 +121,7 @@ void OGLRender::draw(const Scene &_scene) {
                   oglSpotLights.size() * sizeof(OGLSpotLight),
                   oglSpotLights.data());
 
-  glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, spotLightSSBO);
+  glBindBufferBase(GL_SHADER_STORAGE_BUFFER, REN_SPOT_LIGHTS, spotLightSSBO);
 
   glm::mat4 view = glm::mat4_cast(glm::inverse(_scene.camera.rotation)) *
                    glm::translate(glm::mat4(1.0f), -_scene.camera.position);

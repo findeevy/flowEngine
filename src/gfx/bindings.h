@@ -1,0 +1,15 @@
+#ifndef BINDINGS_H
+#define BINDINGS_H
+
+#define REN_POINT_LIGHTS 0
+#define REN_DIRECT_LIGHTS 1
+#define REN_SPOT_LIGHTS 2
+
+#define LOD_SRC_VERTICES 8
+#define LOD_SRC_INDICES  9
+#define LOD_CLUSTERS     10
+#define LOD_OPT_REP      11
+#define LOD_OUT_VERTICES 12
+#define LOD_OUT_INDICES  13
+
+#endif

@@ -1,4 +1,6 @@
 #include "oglMesh.h"
+#include "oglShader.h"
+#include "../bindings.h"
 
 OGLMesh::OGLMesh(const std::string filePath) : Mesh(filePath) {
   glGenVertexArrays(1, &VAO);
@@ -32,6 +34,51 @@ OGLMesh::OGLMesh(const std::string filePath) : Mesh(filePath) {
   glEnableVertexAttribArray(3);
 
   glBindVertexArray(0);
+}
+
+void OGLMesh::lodGen(glm::ivec3 subdivisions, bool cache) {
+  const glm::ivec3 grid = glm::max(subdivisions, glm::ivec3(1));
+  const int key = lodKey(grid);
+
+  const GLsizeiptr clusterCount = (GLsizeiptr)grid.x * grid.y * grid.z;
+
+  GLuint clusterSSBO =
+      makeSSBO(clusterCount * (GLsizeiptr)sizeof(lodQuadric), GL_DYNAMIC_COPY);
+  GLuint optRepSSBO =
+      makeSSBO(clusterCount * (GLsizeiptr)sizeof(glm::vec4), GL_DYNAMIC_COPY);
+
+  OGLLod lod;
+  lod.vertexSSBO =
+      makeSSBO(clusterCount * (GLsizeiptr)sizeof(Vertex), GL_DYNAMIC_COPY);
+  lod.indexSSBO = makeSSBO((GLsizeiptr)(indices.size() * sizeof(uint32_t)),
+                           GL_DYNAMIC_COPY);
+
+  static OGLShader quadricPass({"compute/lodQuadric.comp"});
+
+  zeroFill(clusterSSBO);
+
+  glBindBufferBase(GL_SHADER_STORAGE_BUFFER, LOD_SRC_VERTICES, VBO);
+  glBindBufferBase(GL_SHADER_STORAGE_BUFFER, LOD_SRC_INDICES, EBO);
+  glBindBufferBase(GL_SHADER_STORAGE_BUFFER, LOD_CLUSTERS, clusterSSBO);
+
+  const glm::vec3 extent = glm::max(maxaabb - minaabb, glm::vec3(1e-6f));
+  const glm::vec3 cellSize = extent / glm::vec3(grid);
+  const int triangleCount = (int)(indices.size() / 3);
+
+  quadricPass.bind();
+
+  glUniform3i(glGetUniformLocation(quadricPass.id, "uGrid"), grid.x, grid.y,
+              grid.z);
+  quadricPass.setVec3("uAabbMin", minaabb);
+  quadricPass.setVec3("uCellSize", cellSize);
+  quadricPass.setInt("uTriangleCount", triangleCount);
+
+  glDispatchCompute((GLuint)((triangleCount + 63) / 64), 1, 1);
+  glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+
+  // Computation of optimal representative positions
+
+  // Decimated mesh generation
 }
 
 void OGLMesh::draw() {

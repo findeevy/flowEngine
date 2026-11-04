@@ -1,7 +1,6 @@
 #include "mesh.h"
 
-#include <unordered_map>
-
+// Add gltf? idk
 Mesh::Mesh(const std::string filePath) {
   tinyobj::attrib_t attrib;
   std::vector<tinyobj::shape_t> shapes;
@@ -22,6 +21,9 @@ Mesh::Mesh(const std::string filePath) {
       vertex.position = {attrib.vertices[3 * index.vertex_index + 0],
                          attrib.vertices[3 * index.vertex_index + 1],
                          attrib.vertices[3 * index.vertex_index + 2]};
+
+      minaabb = min(minaabb, vertex.position);
+      maxaabb = max(maxaabb, vertex.position);
 
       if (index.normal_index >= 0) {
         vertex.normal = {attrib.normals[3 * index.normal_index + 0],
@@ -48,7 +50,6 @@ Mesh::Mesh(const std::string filePath) {
       indices.emplace_back(uniqueVertices[vertex]);
     }
   }
-
   computeTangents();
 }
 
