@@ -68,10 +68,10 @@ void OGLMesh::lodGen(int split, bool cache) {
     GLuint clusterSSBO = OGLShader::makeSSBO(
         clusterCount * (GLsizeiptr)sizeof(lodQuadric), GL_DYNAMIC_COPY);
     GLuint optRepSSBO = OGLShader::makeSSBO(
-        clusterCount * (GLsizeiptr)sizeof(glm::vec4), GL_DYNAMIC_COPY);
+        clusterCount * (GLsizeiptr)sizeof(Vertex), GL_DYNAMIC_COPY);
     GLuint counterSSBO = OGLShader::makeSSBO(sizeof(uint32_t), GL_DYNAMIC_COPY);
     GLuint claimedSSBO = OGLShader::makeSSBO(
-        clusterCount * (GLsizeiptr)sizeof(uint32_t), GL_DYNAMIC_COPY);
+        clusterCount * 2 * (GLsizeiptr)sizeof(uint32_t), GL_DYNAMIC_COPY);
     GLuint tableSSBO = 0;
     uint32_t tableSize = 0;
     if (dedupe) {
@@ -92,7 +92,7 @@ void OGLMesh::lodGen(int split, bool cache) {
     glClearNamedBufferData(counterSSBO, GL_R32UI, GL_RED_INTEGER,
                            GL_UNSIGNED_INT, &zero);
     glClearNamedBufferData(claimedSSBO, GL_R32UI, GL_RED_INTEGER,
-                           GL_UNSIGNED_INT, &zero);
+                           GL_UNSIGNED_INT, &empty);
     if (dedupe)
       glClearNamedBufferData(tableSSBO, GL_R32UI, GL_RED_INTEGER,
                              GL_UNSIGNED_INT, &empty);
@@ -119,7 +119,7 @@ void OGLMesh::lodGen(int split, bool cache) {
 
     optPass.bind();
     glUniform3i(glGetUniformLocation(optPass.id, "uGrid"), grid.x, grid.y,
-                grid.z); // uniforms are per-program
+                grid.z);
     optPass.setVec3("uAabbMin", minaabb);
     optPass.setVec3("uCellSize", cellSize);
     glDispatchCompute((GLuint)(((int)clusterCount + 63) / 64), 1, 1);
@@ -147,7 +147,14 @@ void OGLMesh::lodGen(int split, bool cache) {
     if (dedupe)
       glUniform1ui(glGetUniformLocation(decimatePass.id, "uTableMask"),
                    tableSize - 1u);
-    glDispatchCompute((GLuint)((triangleCount + 63) / 64), 1, 1);
+    const GLuint groups = (GLuint)((triangleCount + 63) / 64);
+    const GLint passLoc = glGetUniformLocation(decimatePass.id, "uPass");
+
+    for (GLuint pass = 0; pass < 3; pass++) {
+      glUniform1ui(passLoc, pass);
+      glDispatchCompute(groups, 1, 1);
+      glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+    }
     glMemoryBarrier(
         GL_SHADER_STORAGE_BARRIER_BIT | GL_BUFFER_UPDATE_BARRIER_BIT |
         GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT | GL_ELEMENT_ARRAY_BARRIER_BIT);
@@ -191,6 +198,7 @@ void OGLMesh::lodGen(int split, bool cache) {
   VBO = lod.vertexSSBO;
   EBO = lod.indexSSBO;
   indices.resize(lod.indexCount);
+  computeTangents();
 }
 
 void OGLMesh::draw() {

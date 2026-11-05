@@ -49,8 +49,9 @@ void FlowEngine::update() {
       auto end = std::chrono::high_resolution_clock::now();
       std::chrono::duration<float> dur = end - start;
       if (lodcnt > 2)
-        lodcnt/=2;
-      else lodcnt = 128;
+        lodcnt -= 2;
+      else
+        lodcnt = 128;
       LOG_EVENT("Mesh " + object.name +
                 " – LOD Gen: " + std::to_string(dur.count()) + " s | " +
                 "FPS: " + std::to_string(1.0f / deltaTime));

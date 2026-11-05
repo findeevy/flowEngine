@@ -23,10 +23,10 @@ public:
   OGLMesh(const std::string filePath);
   void draw() override;
 
-  //grid based
+  // grid based
   void lodGen(int split, bool cache) override;
-  //oct tree based coming soooon?
-  
+  // oct tree based coming soooon?
+
   GLuint getVBO() const { return VBO; }
   GLuint getEBO() const { return EBO; }
   ~OGLMesh() override;

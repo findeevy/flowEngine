@@ -27,6 +27,6 @@ public:
   virtual void draw() = 0;
   virtual ~Mesh() = default;
 
-private:
+protected:
   void computeTangents();
 };

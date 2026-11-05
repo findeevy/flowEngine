@@ -14,6 +14,8 @@ struct Vertex {
 struct LodQuadric {
   ATOMIC_FLOAT_T q[10];
   ATOMIC_FLOAT_T posSum[3];
+  ATOMIC_FLOAT_T norSum[3];
+  ATOMIC_FLOAT_T texSum[2];
   uint count;
 };
 
@@ -99,6 +101,9 @@ void main() {
   // add this face's quadric (and each corner's position) to the corner's
   // cluster
   for (uint i = 0; i < 3; i++) {
+    uint vertexIndex = indices[triangleIndex + i];
+    Vertex vtx = vertices[vertexIndex];
+
     uint c = findCluster(pos[i]);
 
     for (uint j = 0; j < 10; j++) {
@@ -107,6 +112,11 @@ void main() {
 
     for (uint k = 0; k < 3; k++) {
       ATOMIC_ADD_FLOAT(clusters[c].posSum[k], pos[i][k]);
+      ATOMIC_ADD_FLOAT(clusters[c].norSum[k], vtx.normal[k]);
+    }
+
+    for (uint k = 0; k < 2; k++) {
+      ATOMIC_ADD_FLOAT(clusters[c].texSum[k], vtx.texCoord[k]);
     }
 
     atomicAdd(clusters[c].count, 1u);

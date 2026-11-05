@@ -21,7 +21,7 @@ layout(std430, binding = 12) buffer OutVerts { Vertex oVerts[]; };
 layout(std430, binding = 13) buffer OutInd { uint oInds[]; };
 
 layout(std430, binding = 14) buffer Counter { uint outCount; };
-layout(std430, binding = 15) buffer Claimed { uint claimed[]; };
+layout(std430, binding = 15) buffer Best { uint best[]; };
 
 layout(std430, binding = 16) buffer HashTable { uint table[]; };
 const uint EMPTY = 0xFFFFFFFFu;
@@ -54,6 +54,9 @@ uniform int uTriangleCount;
 // for hash
 uniform uint uTableMask;
 
+// 0 = closest distance, 1 = closest index tie-break, 2 = emit
+uniform uint uPass;
+
 vec3 getPos(uint vi) {
   Vertex v = vertices[vi];
   return vec3(v.position[0], v.position[1], v.position[2]) - uAabbMin;
@@ -72,13 +75,14 @@ uvec3 clustersOfTri(uint t) {
                findCluster(getPos(indices[3u * t + 2u])));
 }
 
-void writeClusterVertex(uint cluster, uint srcIndex) {
-  if (atomicExchange(claimed[cluster], 1u) != 0u)
-    return;
+uint distBits(vec3 p, uint cluster) {
+  vec3 d = p - optVerts[cluster].xyz;
+  return floatBitsToUint(dot(d, d));
+}
 
-  Vertex s = vertices[srcIndex];
+void writeClusterVertex(uint cluster) {
+  Vertex s = vertices[best[2u * cluster + 1u]];
   vec3 p = optVerts[cluster].xyz + uAabbMin;
-  ;
 
   oVerts[cluster].position[0] = p.x;
   oVerts[cluster].position[1] = p.y;
@@ -96,8 +100,26 @@ void main() {
   if (gl_GlobalInvocationID.x >= uint(uTriangleCount))
     return;
 
-  // load triangle
   uint triangleIndex = gl_GlobalInvocationID.x * 3u;
+
+  if (uPass < 2u) {
+    for (uint i = 0u; i < 3u; i++) {
+      uint vi = indices[triangleIndex + i];
+      vec3 p = getPos(vi);
+      //distance from optimal position in cell
+      uint c = findCluster(p);
+      uint db = distBits(p, c);
+      //set minimum, then break the tie if there is one
+      if (uPass == 0u) {
+        atomicMin(best[2u * c], db);
+      } else if (db == best[2u * c]) {
+        atomicMin(best[2u * c + 1u], vi);
+      }
+    }
+    return;
+  }
+
+  // load triangle
   uint ix = indices[triangleIndex + 0u];
   uint iy = indices[triangleIndex + 1u];
   uint iz = indices[triangleIndex + 2u];
@@ -139,7 +161,7 @@ void main() {
   oInds[o + 1u] = cy;
   oInds[o + 2u] = cz;
 
-  writeClusterVertex(cx, ix);
-  writeClusterVertex(cy, iy);
-  writeClusterVertex(cz, iz);
+  writeClusterVertex(cx);
+  writeClusterVertex(cy);
+  writeClusterVertex(cz);
 }
