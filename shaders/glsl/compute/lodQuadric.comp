@@ -6,7 +6,7 @@ layout(local_size_x = 64) in;
 
 struct Vertex {
   float position[3];
-  float normal[3];sss
+  float normal[3];
   float texCoord[2];
   float tangent[3];
 };

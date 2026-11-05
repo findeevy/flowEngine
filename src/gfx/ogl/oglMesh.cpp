@@ -82,6 +82,8 @@ void OGLMesh::lodGen(glm::ivec3 subdivisions, bool cache) {
 
   // Computation of optimal representative positions
 
+  // fill in lol
+
   // Decimated mesh generation
 }
 
