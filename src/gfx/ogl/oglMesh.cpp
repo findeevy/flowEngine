@@ -36,6 +36,10 @@ OGLMesh::OGLMesh(const std::string filePath) : Mesh(filePath) {
   glBindVertexArray(0);
 }
 
+static int OGLMesh::lodKey(const glm::ivec3 &g) {
+  return (g.x & 0x3FF) | ((g.y & 0x3FF) << 10) | ((g.z & 0x3FF) << 20);
+}
+
 void OGLMesh::lodGen(glm::ivec3 subdivisions, bool cache) {
   const glm::ivec3 grid = glm::max(subdivisions, glm::ivec3(1));
   const int key = lodKey(grid);
@@ -53,7 +57,7 @@ void OGLMesh::lodGen(glm::ivec3 subdivisions, bool cache) {
   lod.indexSSBO = makeSSBO((GLsizeiptr)(indices.size() * sizeof(uint32_t)),
                            GL_DYNAMIC_COPY);
 
-  static OGLShader quadricPass({"glsl/scompute/lodQuadric.comp"});
+  static OGLShader quadricPass({"glsl/compute/lodQuadric.comp"});
 
   zeroFill(clusterSSBO);
 

@@ -1,45 +1,50 @@
 #version 430 core
 
+#include "floatAtomic.glsl"
+
 layout(local_size_x = 64) in;
 
 struct Vertex {
-  vec3 position;
-  vec3 normal;
-  vec2 texCoord;
-  vec3 tangent;
+  float position[3];
+  float normal[3];sss
+  float texCoord[2];
+  float tangent[3];
 };
 
 struct LodQuadric {
-  float q[10];
-  float avg[3];
+  ATOMIC_FLOAT_T q[10];
+  ATOMIC_FLOAT_T posSum[3];
   uint count;
 };
 
-layout(std430, binding = 0) readonly buffer SourceVertices {
+struct QuadricF {
+  float q[10];
+};
+
+layout(std430, binding = 8) readonly buffer SourceVertices {
   Vertex vertices[];
 };
 
-layout(std430, binding = 1) readonly buffer SourceIndices { uint indices[]; };
+layout(std430, binding = 9) readonly buffer SourceIndices { uint indices[]; };
 
-layout(std430, binding = 2) buffer ClusterQuadrics { LodQuadric clusters[]; };
+layout(std430, binding = 10) buffer ClusterQuadrics { LodQuadric clusters[]; };
 
 // # of divisions
 uniform ivec3 uGrid;
 uniform vec3 uAabbMin;
-// size of each sell
+// size of each cell
 uniform vec3 uCellSize;
 uniform int uTriangleCount;
 
 // find part of cluster grid vert is in
 uint findCluster(vec3 position) {
-  // normalize the position to aabb
-  ivec3 npos = ivec3(floor((position - uAabbMin) / (uCellSize)));
+  ivec3 npos = ivec3(floor((position) / uCellSize));
   npos = clamp(npos, ivec3(0), uGrid - ivec3(1));
   return uint(uGrid.x * uGrid.y * npos.z + npos.y * uGrid.x + npos.x);
 }
 
-LodQuadric toLodQuadric(mat4 m) {
-  LodQuadric quad;
+QuadricF toQuadricF(mat4 m) {
+  QuadricF quad;
 
   quad.q[0] = m[0][0];
   quad.q[1] = m[0][1];
@@ -59,47 +64,51 @@ LodQuadric toLodQuadric(mat4 m) {
 }
 
 void main() {
+
+  // check if valid triangles
+  if (gl_GlobalInvocationID.x >= uint(uTriangleCount))
+    return;
+
   uint triangleIndex = gl_GlobalInvocationID.x * 3;
 
-  Vertex v[3];
+  vec3 pos[3];
   for (uint i = 0; i < 3; i++) {
-    v[i] = vertices[indices[triangleIndex + i]];
+    Vertex vtx = vertices[indices[triangleIndex + i]];
+    pos[i] = vec3(vtx.position[0], vtx.position[1], vtx.position[2]) - uAabbMin;
   }
+  vec3 e0 = pos[1] - pos[0];
+  vec3 e1 = pos[2] - pos[0];
 
-  // calculate triangle quadric
-  vec3 e0 = v[1].position - v[0].position;
-  vec3 e1 = v[2].position - v[0].position;
+  // reject degenerate triangles BEFORE normalizing
+  vec3 cr = cross(e0, e1);
+  float len = length(cr);
+  if (len < 1e-12)
+    return;
+  vec3 n = cr / len;
 
-  vec3 n = normalize(cross(e0, e1));
-
-  // plane equation? should be ax + by +cz + d = 0
-  float d = -dot(n, v[0].position);
-
-  // plane vector
+  // plane equation: ax + by + cz + d = 0
+  float d = -dot(n, pos[0]);
   vec4 p = vec4(n, d);
 
-  // generate matrix (face quadric)
+  // face quadric
   mat4 Q = outerProduct(p, p);
+  Q *= 0.5 * len;
 
-  LodQuadric lq = toLodQuadric(Q);
+  QuadricF lq = toQuadricF(Q);
 
-  // determine triangle's cluster, atomics on cpu side?
+  // add this face's quadric (and each corner's position) to the corner's
+  // cluster
   for (uint i = 0; i < 3; i++) {
-    uint c = findCluster(v[i].position);
+    uint c = findCluster(pos[i]);
 
     for (uint j = 0; j < 10; j++) {
-      clusters[c].q[j] += lq.q[j];
+      ATOMIC_ADD_FLOAT(clusters[c].q[j], lq.q[j]);
     }
 
-    ++clusters[c].count;
-    clusters[c].avg[0] =
-        ((v[i].position.x) / clusters[c].count) +
-        clusters[c].avg[0] * (clusters[c].count - 1) / (clusters[c].count);
-    clusters[c].avg[1] =
-        ((v[i].position.y) / clusters[c].count) +
-        clusters[c].avg[1] * (clusters[c].count - 1) / (clusters[c].count);
-    clusters[c].avg[2] =
-        ((v[i].position.z) / clusters[c].count) +
-        clusters[c].avg[2] * (clusters[c].count - 1) / (clusters[c].count);
+    for (uint k = 0; k < 3; k++) {
+      ATOMIC_ADD_FLOAT(clusters[c].posSum[k], pos[i][k]);
+    }
+
+    atomicAdd(clusters[c].count, 1u);
   }
 }

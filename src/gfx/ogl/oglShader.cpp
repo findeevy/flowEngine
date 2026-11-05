@@ -167,3 +167,19 @@ void OGLShader::checkCompileErrors(GLuint shader, std::string type) {
     }
   }
 }
+
+static GLuint makeSSBO(GLsizeiptr size, GLenum usage) {
+  GLuint buf = 0;
+  glGenBuffers(1, &buf);
+  glBindBuffer(GL_SHADER_STORAGE_BUFFER, buf);
+  glBufferData(GL_SHADER_STORAGE_BUFFER, size, nullptr, usage);
+  glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+  return buf;
+}
+
+static void zeroFill(GLuint buf) {
+  glBindBuffer(GL_SHADER_STORAGE_BUFFER, buf);
+  glClearBufferData(GL_SHADER_STORAGE_BUFFER, GL_R32UI, GL_RED_INTEGER,
+                    GL_UNSIGNED_INT, nullptr);
+  glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+}
