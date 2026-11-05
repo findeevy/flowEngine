@@ -53,7 +53,7 @@ void OGLMesh::lodGen(glm::ivec3 subdivisions, bool cache) {
   lod.indexSSBO = makeSSBO((GLsizeiptr)(indices.size() * sizeof(uint32_t)),
                            GL_DYNAMIC_COPY);
 
-  static OGLShader quadricPass({"compute/lodQuadric.comp"});
+  static OGLShader quadricPass({"glsl/scompute/lodQuadric.comp"});
 
   zeroFill(clusterSSBO);
 

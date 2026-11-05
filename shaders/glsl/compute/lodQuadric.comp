@@ -1,0 +1,104 @@
+#version 430 core
+
+layout(local_size_x = 64) in;
+
+struct Vertex {
+  vec3 position;
+  vec3 normal;
+  vec2 texCoord;
+  vec3 tangent;
+};
+
+struct LodQuadric {
+  float    q[10];
+  float    avg[3];
+  uint count;
+};
+
+layout(std430, binding = 0) readonly buffer SourceVertices {
+    Vertex vertices[];
+};
+
+layout(std430, binding = 1) readonly buffer SourceIndices {
+    uint indices[];
+};
+
+layout(std430, binding = 2) buffer ClusterQuadrics {
+    LodQuadric clusters[];
+};
+
+//# of divisions
+uniform ivec3 uGrid;
+uniform vec3 uAabbMin;
+//size of each sell
+uniform vec3 uCellSize;
+uniform int uTriangleCount;
+
+//find part of cluster grid vert is in
+uint findCluster(vec3 position) {
+   //normalize the position to aabb
+    ivec3 npos = ivec3(floor((position - uAabbMin)/(uCellSize)));
+    npos = clamp(npos, ivec3(0), uGrid - ivec3(1));
+    return uint(npos.x*npos.y*npos.z+npos.y*npos.x+npos.x);
+}
+
+LodQuadric toLodQuadric(mat4 m){
+    LodQuadric quad;
+
+    quad.q[0] = m[0][0];
+    quad.q[1] = m[0][1];
+    quad.q[2] = m[0][2];
+    quad.q[3] = m[0][3];
+    
+    quad.q[4] = m[1][1];
+    quad.q[5] = m[1][2];
+    quad.q[6] = m[1][3];
+
+    quad.q[7] = m[2][2];
+    quad.q[8] = m[2][3];
+
+    quad.q[9] = m[3][3];
+
+    return quad;
+}
+
+void main() {
+    uint triangleIndex = gl_GlobalInvocationID.x*3;
+    
+    Vertex v[3];
+    for (uint i = 0; i < 3; i++){
+        v[i] = vertices[indices[triangleIndex+i]];
+    }
+
+
+    //calculate triangle quadric
+    vec3 e0 = v[1].position - v[0].position;
+    vec3 e1 = v[2].position - v[0].position;
+
+    vec3 n = normalize(cross(e0, e1));
+
+    //plane equation? should be ax + by +cz + d = 0
+    float d = -dot(n, v[0].position);
+    
+    //plane vector
+    vec4 p = vec4(n, d);
+
+    //generate matrix (face quadric)
+    mat4 Q = outerProduct(p, p);
+
+    LodQuadric lq = toLodQuadric(Q);
+
+    //determine triangle's cluster, atomics on cpu side?
+    for (uint i = 0; i < 3; i++){
+        uint c = findCluster(v[i].position);
+
+        for (uint j = 0; j < 10; j++){
+            clusters[c].q[j] += lq.q[j];
+        }
+
+        ++clusters[c].count;
+        clusters[c].avg[0] = ((v[i].position.x)/clusters[c].count) + clusters[c].avg[0]*(clusters[c].count-1)/(clusters[c].count);
+        clusters[c].avg[1] = ((v[i].position.y)/clusters[c].count) + clusters[c].avg[1]*(clusters[c].count-1)/(clusters[c].count);
+        clusters[c].avg[2] = ((v[i].position.z)/clusters[c].count) + clusters[c].avg[2]*(clusters[c].count-1)/(clusters[c].count);
+    }
+}

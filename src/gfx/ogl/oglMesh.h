@@ -17,8 +17,8 @@ public:
   OGLMesh(const std::string filePath);
   void draw() override;
   void lodGen(glm::ivec3 subdivisions, bool cache) override;
-   GLuint getVBO() const { return VBO; } 
-    GLuint getVBO() const { return EBO; } 
+  GLuint getVBO() const { return VBO; } 
+  GLuint getEBO() const { return EBO; } 
   ~OGLMesh() override;
 
   OGLMesh(const OGLMesh &) = delete;
