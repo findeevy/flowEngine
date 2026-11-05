@@ -1,9 +1,9 @@
 #include "oglRender.h"
 #include "../../utils/logger.h"
+#include "../bindings.h"
 #include "oglMesh.h"
 #include "oglPipeline.h"
 #include "oglTexture.h"
-#include "../bindings.h"
 
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
@@ -99,7 +99,8 @@ void OGLRender::draw(const Scene &_scene) {
                   oglDirectionalLights.size() * sizeof(OGLDirectionalLight),
                   oglDirectionalLights.data());
 
-  glBindBufferBase(GL_SHADER_STORAGE_BUFFER, REN_DIRECT_LIGHTS, directionalLightSSBO);
+  glBindBufferBase(GL_SHADER_STORAGE_BUFFER, REN_DIRECT_LIGHTS,
+                   directionalLightSSBO);
 
   struct SpotLightHead {
     int spotLightCount;

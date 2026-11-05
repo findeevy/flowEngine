@@ -1,6 +1,6 @@
 #include "oglMesh.h"
-#include "oglShader.h"
 #include "../bindings.h"
+#include "oglShader.h"
 
 OGLMesh::OGLMesh(const std::string filePath) : Mesh(filePath) {
   glGenVertexArrays(1, &VAO);
