@@ -40,9 +40,21 @@ void FlowEngine::update() {
   renderer->draw(scene);
 
   // TEST CODE
-  angle += 60.0f * deltaTime;
-  for (GameObject &object : scene.gameObjects) {
-    object.rotation = glm::quat(glm::radians(glm::vec3(0.0f, angle, 0.0f)));
+  angle += deltaTime;
+  if (angle > 0.5f) {
+    angle = 0.0f;
+    for (GameObject &object : scene.gameObjects) {
+      auto start = std::chrono::high_resolution_clock::now();
+      object.mesh->lodGen(lodcnt, true);
+      auto end = std::chrono::high_resolution_clock::now();
+      std::chrono::duration<float> dur = end - start;
+      if (lodcnt > 2)
+        lodcnt/=2;
+      else lodcnt = 128;
+      LOG_EVENT("Mesh " + object.name +
+                " – LOD Gen: " + std::to_string(dur.count()) + " s | " +
+                "FPS: " + std::to_string(1.0f / deltaTime));
+    }
   }
   // TEST CODE
 
@@ -54,7 +66,7 @@ void FlowEngine::update() {
   process();
 
   // TEST CODE
-  std::cout << "\r" << 1.0f / deltaTime << std::flush;
+  // std::cout << "\r" << 1.0f / deltaTime << std::flush;
   // TEST CODE
 }
 

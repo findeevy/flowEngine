@@ -26,6 +26,14 @@ layout(std430, binding = 10) readonly buffer ClusterQuadrics {
 };
 layout(std430, binding = 11) buffer OptminalVerts { vec4 verts[]; };
 
+QuadricF loadQuadricF(uint index) {
+  QuadricF quad;
+  for (int i = 0; i < 10; i++) {
+    quad.q[i] = ATOMIC_GET_FLOAT(clusters[index].q[i]);
+  }
+  return quad;
+}
+
 mat4 toMat4(QuadricF quad) {
   mat4 m = mat4(0.0);
 
@@ -33,17 +41,14 @@ mat4 toMat4(QuadricF quad) {
   m[0][1] = quad.q[1];
   m[0][2] = quad.q[2];
   m[0][3] = quad.q[3];
-
   m[1][0] = quad.q[1];
   m[1][1] = quad.q[4];
   m[1][2] = quad.q[5];
   m[1][3] = quad.q[6];
-
   m[2][0] = quad.q[2];
   m[2][1] = quad.q[5];
   m[2][2] = quad.q[7];
   m[2][3] = quad.q[8];
-
   m[3][0] = quad.q[3];
   m[3][1] = quad.q[6];
   m[3][2] = quad.q[8];
@@ -53,26 +58,30 @@ mat4 toMat4(QuadricF quad) {
 }
 
 void main() {
-  mat4 Q = toMat4(clusters[gl_GlobalInvocationID.x].q);
-  vec3 avg(0);
-  for (uint i = 0; i < 3; i++) {
-    avg[i] = (clusters[gl_GlobalInvocationID.x].posSum[i]) / count;
+  uint idx = gl_GlobalInvocationID.x;
+  QuadricF qf = loadQuadricF(idx);
+  mat4 Q = toMat4(qf);
+
+  uint cnt = clusters[idx].count;
+  vec3 avg = vec3(0.0);
+  if (cnt > 0u) {
+    avg = vec3(ATOMIC_GET_FLOAT(clusters[idx].posSum[0]),
+               ATOMIC_GET_FLOAT(clusters[idx].posSum[1]),
+               ATOMIC_GET_FLOAT(clusters[idx].posSum[2])) /
+          float(cnt);
   }
 
   mat3 A = mat3(Q);
-
   vec3 b = vec3(Q[0][3], Q[1][3], Q[2][3]);
 
-  // research further
   float det = determinant(A);
-
-  vec3 optVert(0);
+  vec3 optVert = vec3(0.0);
 
   if (abs(det) < 1e-10) {
     optVert = avg;
   } else {
-    optVert = -inverse(A) * b;
+    optVert = inverse(A) * (-b);
   }
 
-  OptminalVerts[gl_GlobalInvocationID.x] = vec4(optVert, 0.0)
+  verts[idx] = vec4(optVert, 0.0);
 }

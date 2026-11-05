@@ -15,6 +15,7 @@ OGLRender::OGLRender() {
     LOG_EVENT("Failed to initialize GLAD");
     exit(0);
   }
+  glfwSwapInterval(0);
   glEnable(GL_DEPTH_TEST);
   glGenBuffers(1, &pointLightSSBO);
   glGenBuffers(1, &directionalLightSSBO);
@@ -77,7 +78,7 @@ void OGLRender::draw(const Scene &_scene) {
                   oglPointLights.size() * sizeof(OGLPointLight),
                   oglPointLights.data());
 
-  glBindBufferBase(GL_SHADER_STORAGE_BUFFER, POINT_LIGHTS, pointLightSSBO);
+  glBindBufferBase(GL_SHADER_STORAGE_BUFFER, REN_POINT_LIGHTS, pointLightSSBO);
 
   struct DirectionalLightHead {
     int directionalLightCount;

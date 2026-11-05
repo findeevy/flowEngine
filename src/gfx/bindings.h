@@ -11,5 +11,8 @@
 #define LOD_OPT_REP 11
 #define LOD_OUT_VERTICES 12
 #define LOD_OUT_INDICES 13
+#define LOD_COUNTER 14
+#define LOD_CLAIMED 15
+#define LOD_HASH 16
 
 #endif

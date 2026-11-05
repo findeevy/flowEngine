@@ -34,8 +34,8 @@ public:
   void setMat3(const std::string &name, const glm::mat3 &value) override;
   void setMat4(const std::string &name, const glm::mat4 &value) override;
 
-  GLuint makeSSBO(GLsizeiptr size, GLenum usage);
-  void zeroFill(GLuint buf);
+  static GLuint makeSSBO(GLsizeiptr size, GLenum usage);
+  static void zeroFill(GLuint buf);
 
 private:
   static std::string loadShader(const std::string &path,

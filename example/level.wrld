@@ -14,8 +14,8 @@
   "gameObjects": {
     "head" :{
       "path": "example/obj.tree",
-      "position": [0, 0, -0.5],
-      "rotation": [-90, 0, -90]}
+      "position": [0, 0.05, -0.25],
+      "rotation": [0, 0, 0]}
   },
 
   "pointLights": [

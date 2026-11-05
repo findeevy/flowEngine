@@ -30,6 +30,8 @@ private:
   std::chrono::steady_clock::time_point lastFrameTime;
   float deltaTime = 0.0f;
 
+  int lodcnt = 128;
+
   std::vector<Event> eventQueue;
 
   void init();
