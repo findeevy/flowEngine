@@ -40,22 +40,31 @@ void FlowEngine::update() {
   renderer->draw(scene);
 
   // TEST CODE
-  angle += deltaTime;
-  if (angle > 0.5f) {
-    angle = 0.0f;
+  timer += deltaTime;
+  angle += 2.0f * deltaTime;
+  for (GameObject &object : scene.gameObjects) {
+    object.rotation = glm::quat(glm::radians(glm::vec3(0.0f, angle, 0.0f)));
+  }
+  if (timer > 0.5f) {
+    timer = 0.0f;
+
+    static const float kErrs[] = {0.05f,  0.03f,  0.02f,  0.01f,
+                                  0.005f, 0.003f, 0.002f, 0.001f};
+    static const int kNumErrs = sizeof(kErrs) / sizeof(kErrs[0]);
+    static int errIdx = 8;
+    const float err = kErrs[8 - errIdx];
+
     for (GameObject &object : scene.gameObjects) {
       auto start = std::chrono::high_resolution_clock::now();
-      object.mesh->lodGen(lodcnt, true);
+      object.mesh->lodOctGen(1, 8, err, true);
       auto end = std::chrono::high_resolution_clock::now();
       std::chrono::duration<float> dur = end - start;
-      if (lodcnt > 2)
-        lodcnt -= 2;
-      else
-        lodcnt = 128;
-      LOG_EVENT("Mesh " + object.name +
+      LOG_EVENT("Mesh " + object.name + " err=" + std::to_string(err) +
                 " – LOD Gen: " + std::to_string(dur.count()) + " s | " +
                 "FPS: " + std::to_string(1.0f / deltaTime));
     }
+
+    errIdx = (errIdx + 1) % kNumErrs;
   }
   // TEST CODE
 

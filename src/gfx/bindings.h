@@ -14,5 +14,14 @@
 #define LOD_COUNTER 14
 #define LOD_CLAIMED 15
 #define LOD_HASH 16
+#define LOD_CHILDREN 17
+#define LOD_POOL 18
+#define LOD_VERT_CLUSTER 19
+#define LOD_VERT_BOX 20
+#define LOD_LEVEL_STATE 21
+#define LOD_OCT_KEYS 22
+#define LOD_VERT_QUADRIC 23
+#define LOD_REMAP 24
+#define LOD_VERT_COUNTER 25
 
 #endif

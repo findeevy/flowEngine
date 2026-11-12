@@ -25,12 +25,13 @@ private:
   Scene scene;
 
   // test
+  float timer = 0.0f;
   float angle = 0.0f;
 
   std::chrono::steady_clock::time_point lastFrameTime;
   float deltaTime = 0.0f;
 
-  int lodcnt = 64;
+  int lodcnt = 8;
 
   std::vector<Event> eventQueue;
 

@@ -1,0 +1,82 @@
+#version 430 core
+// Pass 2 (per slot, all levels): optimal vertex + error for every stored node.
+// err is the area-normalised mean squared quadric error (same units as the
+// threshold), so it is comparable between levels and sampling rates.
+
+#include "../floatAtomic.glsl"
+#include "../octNode.glsl"
+#include "../octTree.glsl"
+
+layout(local_size_x = 64) in;
+
+layout(std430, binding = 10) readonly buffer Nodes { OctNode nodes[]; };
+layout(std430, binding = 11) buffer OptVerts { vec4 verts[]; };
+
+uniform uint uTotalSlots;
+
+mat4 loadQ(uint s) {
+  float q[10];
+  for (int i = 0; i < 10; i++)
+    q[i] = ATOMIC_GET_FLOAT(nodes[s].q[i]);
+  mat4 m = mat4(0.0);
+  m[0][0] = q[0];
+  m[0][1] = q[1];
+  m[0][2] = q[2];
+  m[0][3] = q[3];
+  m[1][0] = q[1];
+  m[1][1] = q[4];
+  m[1][2] = q[5];
+  m[1][3] = q[6];
+  m[2][0] = q[2];
+  m[2][1] = q[5];
+  m[2][2] = q[7];
+  m[2][3] = q[8];
+  m[3][0] = q[3];
+  m[3][1] = q[6];
+  m[3][2] = q[8];
+  m[3][3] = q[9];
+  return m;
+}
+
+void main() {
+  uint s = gl_GlobalInvocationID.x;
+  if (s >= uTotalSlots)
+    return;
+
+  uint k = keys[s];
+  uint cnt = nodes[s].count;
+  if (k == KEY_EMPTY || cnt == 0u) {
+    verts[s] = vec4(0.0, 0.0, 0.0, -1.0);
+    return;
+  }
+
+  // which level / cell is this slot?
+  uint l = 0u;
+  for (uint i = 1u; i < uLevels; i++)
+    if (s >= uLevelOffset[i])
+      l = i;
+  uint res = uLevelRes[l];
+  uvec3 n = uvec3(k % res, (k / res) % res, k / (res * res));
+  vec3 cell = uCellSize0 / float(1u << l);
+  vec3 bmin = vec3(n) * cell;
+
+  mat4 Q = loadQ(s);
+  vec3 avg =
+      vec3(ATOMIC_GET_FLOAT(nodes[s].p[0]), ATOMIC_GET_FLOAT(nodes[s].p[1]),
+           ATOMIC_GET_FLOAT(nodes[s].p[2])) /
+      float(cnt);
+
+  mat3 A = mat3(Q);
+  vec3 b = vec3(Q[0][3], Q[1][3], Q[2][3]);
+  vec3 opt = avg;
+  if (abs(determinant(A)) >= 1e-10)
+    opt = inverse(A) * (-b);
+
+  opt = clamp(opt, bmin, bmin + cell);
+
+  float areaW = Q[0][0] + Q[1][1] + Q[2][2];
+  vec4 h = vec4(opt, 1.0);
+  float err = max(dot(h, Q * h), 0.0) / max(areaW, 1e-12);
+
+  verts[s] = vec4(opt, err);
+}

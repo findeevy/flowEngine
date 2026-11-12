@@ -1,13 +1,8 @@
 #version 430 core
 
-layout(local_size_x = 64) in;
+#include "../vertex.glsl"
 
-struct Vertex {
-  float position[3];
-  float normal[3];
-  float texCoord[2];
-  float tangent[3];
-};
+layout(local_size_x = 64) in;
 
 layout(std430, binding = 8) readonly buffer SourceVertices {
   Vertex vertices[];
@@ -106,10 +101,10 @@ void main() {
     for (uint i = 0u; i < 3u; i++) {
       uint vi = indices[triangleIndex + i];
       vec3 p = getPos(vi);
-      //distance from optimal position in cell
+      // distance from optimal position in cell
       uint c = findCluster(p);
       uint db = distBits(p, c);
-      //set minimum, then break the tie if there is one
+      // set minimum, then break the tie if there is one
       if (uPass == 0u) {
         atomicMin(best[2u * c], db);
       } else if (db == best[2u * c]) {

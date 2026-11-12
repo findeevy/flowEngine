@@ -15,6 +15,7 @@ OGLRender::OGLRender() {
     LOG_EVENT("Failed to initialize GLAD");
     exit(0);
   }
+  LOG_EVENT(reinterpret_cast<const char *>(glGetString(GL_RENDERER)));
   glfwSwapInterval(0);
   glEnable(GL_DEPTH_TEST);
   glGenBuffers(1, &pointLightSSBO);

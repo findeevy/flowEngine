@@ -1,0 +1,43 @@
+#version 430 core
+// FINDCLUSTER (per vertex)
+
+#include "../floatAtomic.glsl"
+#include "../octTree.glsl"
+#include "../vertex.glsl"
+
+layout(local_size_x = 64) in;
+
+layout(std430, binding = 8) readonly buffer SourceVertices {
+  Vertex vertices[];
+};
+layout(std430, binding = 11) readonly buffer OptVerts { vec4 verts[]; };
+layout(std430, binding = 19) buffer VertCluster { uint vertCluster[]; };
+
+uniform vec3 uAabbMin;
+uniform uint uVertexCount;
+uniform float uThreshold;
+
+void main() {
+  uint v = gl_GlobalInvocationID.x;
+  if (v >= uVertexCount)
+    return;
+
+  Vertex src = vertices[v];
+  vec3 pos = vec3(src.position[0], src.position[1], src.position[2]) - uAabbMin;
+
+  uint best = findSlot(0u, nodeKey(pos, 0u));
+  if (best == NONE) {
+    vertCluster[v] = NONE;
+    return;
+  }
+
+  for (uint l = 0u; l + 1u < uLevels; l++) {
+    if (verts[best].w <= uThreshold)
+      break;
+    uint next = findSlot(l + 1u, nodeKey(pos, l + 1u));
+    if (next == NONE)
+      break;
+    best = next;
+  }
+  vertCluster[v] = best;
+}

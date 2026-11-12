@@ -22,7 +22,9 @@ public:
   glm::vec3 maxaabb = glm::vec3(-std::numeric_limits<float>::infinity());
 
   // https://gfx.cs.princeton.edu/gfx/pubs/DeCoro_2007_RMS/real_time_simplification.pdf
-  virtual void lodGen(int split, bool cache) = 0;
+  virtual void lodGridGen(int split, bool cache) = 0;
+  virtual void lodOctGen(int split, int maxDepth, float errFraction,
+                         bool cache) = 0;
 
   virtual void draw() = 0;
   virtual ~Mesh() = default;

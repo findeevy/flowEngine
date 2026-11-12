@@ -1,0 +1,63 @@
+#version 430 core
+// Pass 1b (per vertex): ADDVERTEX.
+
+#include "../floatAtomic.glsl"
+#include "../octNode.glsl"
+#include "../octTree.glsl"
+#include "../vertex.glsl"
+
+layout(local_size_x = 64) in;
+
+layout(std430, binding = 8) readonly buffer SourceVertices {
+  Vertex vertices[];
+};
+layout(std430, binding = 10) buffer Nodes { OctNode nodes[]; };
+layout(std430, binding = 23) readonly buffer VertQuadrics {
+  ATOMIC_FLOAT_T vq[];
+};
+
+uniform vec3 uAabbMin;
+uniform uint uVertexCount;
+uniform uint uSeed;
+uniform float uLevelProb[16];
+
+void accumulate(uint s, float qv[10], vec3 pos) {
+  for (uint k = 0u; k < 10u; k++) {
+    float val = qv[k];
+    ATOMIC_ADD_FLOAT(nodes[s].q[k], val);
+  }
+  for (uint k = 0u; k < 3u; k++) {
+    float val = pos[k];
+    ATOMIC_ADD_FLOAT(nodes[s].p[k], val);
+  }
+  atomicAdd(nodes[s].count, 1u);
+}
+
+void main() {
+  uint v = gl_GlobalInvocationID.x;
+  if (v >= uVertexCount)
+    return;
+
+  Vertex src = vertices[v];
+  vec3 pos = vec3(src.position[0], src.position[1], src.position[2]) - uAabbMin;
+
+  float qv[10];
+  for (uint k = 0u; k < 10u; k++)
+    qv[k] = ATOMIC_GET_FLOAT(vq[v * 10u + k]);
+
+  // root: everyone
+  uint s0 = claimSlot(0u, nodeKey(pos, 0u));
+  if (s0 != NONE)
+    accumulate(s0, qv, pos);
+
+  // finer levels: independent random participation per level
+  for (uint l = 1u; l < uLevels; l++) {
+    float u = float(hashU(v * 0x9E3779B1u ^ (l * 0x85EBCA6Bu) ^ uSeed) >> 8) *
+              (1.0 / 16777216.0);
+    if (u < uLevelProb[l]) {
+      uint s = claimSlot(l, nodeKey(pos, l));
+      if (s != NONE)
+        accumulate(s, qv, pos);
+    }
+  }
+}
